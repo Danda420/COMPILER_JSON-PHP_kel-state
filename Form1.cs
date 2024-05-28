@@ -24,7 +24,7 @@ namespace xtUML1
         private string[] fileNames;
         private bool isJsonFileSelected = false;
         private Translate translator;
-        private bool parsed = true; 
+        private bool parsed = false; 
         public Form1()
         {
             InitializeComponent();

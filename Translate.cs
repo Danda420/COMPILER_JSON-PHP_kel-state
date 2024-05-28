@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using Newtonsoft.Json.Linq;
 using static xtUML1.Translate.JsonData;
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 
 namespace xtUML1
 {
@@ -185,8 +186,7 @@ namespace xtUML1
                         if (attr.data_type == "state")
                         {
                             sourceCodeBuilder.AppendLine("           " +
-                                    $"if ($this->{attr.attribute_name} != {model.class_name}States::{state.state_name.Replace(" ", "").ToUpper()})");
-                            sourceCodeBuilder.AppendLine("           {");
+                                    $"if ($this->{attr.attribute_name} != {model.class_name}States::{state.state_name.Replace(" ", "").ToUpper()})" + " {");
                             sourceCodeBuilder.AppendLine("               " +
                                 $"$this->{attr.attribute_name} = {model.class_name}States::{state.state_name.Replace(" ", "").ToUpper()};");
                             sourceCodeBuilder.AppendLine("           }");
@@ -219,7 +219,7 @@ namespace xtUML1
             sourceCodeBuilder.AppendLine("");
             sourceCodeBuilder.AppendLine($"     public function GetState()" + " {");
             sourceCodeBuilder.AppendLine($"       $this->{stateAttribute};");
-            sourceCodeBuilder.AppendLine("      }\n");
+            sourceCodeBuilder.AppendLine("      }");
         }
 
         private void GenerateClass(JsonData.Model model, JsonData json)
@@ -239,7 +239,7 @@ namespace xtUML1
 
             if (model.attributes != null)
             {
-                GenerateConstructor(model.attributes);
+                GenerateConstructor(model.attributes, model.class_name);
             }
 
             sourceCodeBuilder.AppendLine("");
@@ -256,14 +256,13 @@ namespace xtUML1
                 GenerateSetter(attribute);
             }
 
-            sourceCodeBuilder.AppendLine("");
-
             if (model.states != null)
             {
+                sourceCodeBuilder.AppendLine("");
                 GenerateStateAction(model);
             }
 
-            sourceCodeBuilder.AppendLine("}\n\n");
+            sourceCodeBuilder.AppendLine("}\n");
         }
 
         private void GenerateAttribute(JsonData.Attribute1 attribute, JsonData json)
@@ -292,9 +291,8 @@ namespace xtUML1
             }
             else if (attribute.data_type == "inst_event")
             {
+                sourceCodeBuilder.AppendLine("");
                 string cName = null;
-                string sName = null;
-
                 foreach (JsonData.Model modell in json.model)
                 {
                     if (modell.class_id == attribute.class_id)
@@ -302,25 +300,13 @@ namespace xtUML1
                         cName = modell.class_name;
                     }
                 }
-
-                // kemungkinan berubah
-                foreach (JsonData.Model state in json.model)
-                {
-                    if (state.states != null)
-                    {
-                        foreach (var states in state.states)
-                        {
-                            if (states.state_id == attribute.state_id && states.state_name == attribute.state_name)
-                            {
-                                //sName = states.state_event[0];
-                            }
-                        }
-                    }
-                }
-
-                sourceCodeBuilder.AppendLine($"\n    public function {attribute.event_name}({cName} ${cName}) {{");
-                sourceCodeBuilder.AppendLine($"        ${cName}->{sName}();");
-                sourceCodeBuilder.AppendLine($"}}");
+                sourceCodeBuilder.AppendLine("      " +
+                    $"public void {attribute.event_name}({cName} ${cName})" + " {");
+                sourceCodeBuilder.AppendLine("         " +
+                    $"${cName}->status = {cName}States::{attribute.state_name};");
+                sourceCodeBuilder.AppendLine("      " +
+                    "}");
+                sourceCodeBuilder.AppendLine("");
             }
             else
             {       
@@ -368,7 +354,7 @@ namespace xtUML1
 
             if (associationModel.attributes != null)
             {
-                GenerateConstructor(associationModel.attributes);
+                GenerateConstructor(associationModel.attributes, associationModel.class_name);
             }
 
             foreach (var attribute in associationModel.attributes)
@@ -385,6 +371,7 @@ namespace xtUML1
 
         private void GenerateImportedClass(JsonData.Model imported, JsonData json)
         {
+            stateAttribute = null;
             if (imported == null)
             {
                 return;
@@ -400,7 +387,7 @@ namespace xtUML1
 
             if (imported.attributes != null)
             {
-                GenerateConstructor(imported.attributes);
+                GenerateConstructor(imported.attributes, imported.class_name);
             }
 
             sourceCodeBuilder.AppendLine("");
@@ -417,15 +404,14 @@ namespace xtUML1
                 GenerateSetter(attribute);
             }
 
-            sourceCodeBuilder.AppendLine("");
-
             if (imported.states != null)
             {
-               
+                sourceCodeBuilder.AppendLine("");
+                GenerateStateAction(imported);
             }
         }
 
-        private void GenerateConstructor(List<JsonData.Attribute1> attributes)
+        private void GenerateConstructor(List<JsonData.Attribute1> attributes, string className)
         {
             sourceCodeBuilder.Append($"     public function __construct(");
 
@@ -476,23 +462,29 @@ namespace xtUML1
                 {
                     sourceCodeBuilder.AppendLine($"        $this->{attribute.attribute_name} = ${attribute.attribute_name}");
                 }
-            }
-
-            // Handle the "state" datatype separately outside the loop
-            var stateAttribute = attributes.FirstOrDefault(attr => attr.data_type == "state");
-            if (stateAttribute != null)
-            {
-                // Check if the attribute has a default value and it is a string
-                if (!string.IsNullOrEmpty(stateAttribute.default_value) && stateAttribute.data_type.ToLower() == "state")
+                else if (attribute.default_value != null)
                 {
-                    int lastDotIndex = stateAttribute.default_value.LastIndexOf('.');
-                    // Replace "status" with "state" and "aktif" with "active"
-                    string stringValue = stateAttribute.default_value.Substring(lastDotIndex + 1);
-                    sourceCodeBuilder.AppendLine($"        $this->{stateAttribute.attribute_name} = \"{stringValue}\";");
+                    stateAttribute = attribute.attribute_name;
+                    string input = attribute.default_value;
+                    int dot = input.IndexOf('.');
+                    if (dot != -1)
+                    {
+                        string state = input.Substring(dot + 1);
+                        sourceCodeBuilder.AppendLine("        " +
+                            $"$this->{attribute.attribute_name}" + $" = {className}States::{state.ToUpper()}" + ";");
+                    }
+                    else
+                    {
+                        {
+                            sourceCodeBuilder.AppendLine("        " +
+                                $"$this->{attribute.attribute_name};");
+                        }
+                    }
+
                 }
             }
 
-            sourceCodeBuilder.AppendLine("}");
+            sourceCodeBuilder.AppendLine("     }");
         }
 
         private void GenerateGetter(JsonData.Attribute1 getter)
@@ -501,25 +493,25 @@ namespace xtUML1
             {
                 sourceCodeBuilder.AppendLine($"      public function get{getter.attribute_name}() {{");
                 sourceCodeBuilder.AppendLine($"        return $this->{getter.attribute_name};");
-                sourceCodeBuilder.AppendLine($"}}");
+                sourceCodeBuilder.AppendLine($"      }}");
             }
             else if (getter.data_type == "inst_ref_<timer>")
             {
                 sourceCodeBuilder.AppendLine($"      public function get{getter.attribute_name}() {{");
                 sourceCodeBuilder.AppendLine($"        return $this->{getter.attribute_name};");
-                sourceCodeBuilder.AppendLine($"}}");
+                sourceCodeBuilder.AppendLine($"      }}");
             }
             else if (getter.data_type == "inst_ref")
             {
                 sourceCodeBuilder.AppendLine($"      public function get{getter.attribute_name}Ref() {{");
                 sourceCodeBuilder.AppendLine($"        return $this->{getter.attribute_name}Ref;");
-                sourceCodeBuilder.AppendLine($"}}");
+                sourceCodeBuilder.AppendLine($"      }}");
             }
             else if (getter.data_type == "inst_ref_set")
             {
                 sourceCodeBuilder.AppendLine($"      public function get{getter.attribute_name}RefSet() {{");
                 sourceCodeBuilder.AppendLine($"        return $this->{getter.attribute_name}RefSet;");
-                sourceCodeBuilder.AppendLine($"}}");
+                sourceCodeBuilder.AppendLine($"      }}");
             }
             else if (getter.data_type == "inst_event")
             {
@@ -534,29 +526,40 @@ namespace xtUML1
             {
                 sourceCodeBuilder.AppendLine($"      public function set{setter.attribute_name}(${setter.attribute_name}) {{");
                 sourceCodeBuilder.AppendLine($"        $this->{setter.attribute_name} = ${setter.attribute_name};");
-                sourceCodeBuilder.AppendLine($"}}");
+                sourceCodeBuilder.AppendLine($"      }}");
             }
             else if (setter.data_type == "inst_ref_<timer>")
             {
                 sourceCodeBuilder.AppendLine($"      public function set{setter.attribute_name}(TIMER ${setter.attribute_name}) {{");
                 sourceCodeBuilder.AppendLine($"        $this->{setter.attribute_name} = ${setter.attribute_name};");
-                sourceCodeBuilder.AppendLine($"}}");
+                sourceCodeBuilder.AppendLine($"      }}");
             }
             else if (setter.data_type == "inst_ref")
             {
                 sourceCodeBuilder.AppendLine($"      public function set{setter.attribute_name}Ref({setter.related_class_name} ${setter.attribute_name}Ref) {{");
                 sourceCodeBuilder.AppendLine($"        $this->{setter.attribute_name}Ref = ${setter.attribute_name}Ref;");
-                sourceCodeBuilder.AppendLine($"}}");
+                sourceCodeBuilder.AppendLine($"      }}");
             }
             else if (setter.data_type == "inst_ref_set")
             {
                 sourceCodeBuilder.AppendLine($"      public function set{setter.attribute_name}RefSet({setter.related_class_name} ${setter.attribute_name}) {{");
                 sourceCodeBuilder.AppendLine($"        $this->{setter.attribute_name}RefSet[] = ${setter.attribute_name};");
-                sourceCodeBuilder.AppendLine($"}}");
+                sourceCodeBuilder.AppendLine($"      }}");
             }
             else if (setter.data_type == "inst_event")
             {
                 return;
+            }
+
+        }
+
+        private void GenerateGetState(JsonData.Attribute1 getstate)
+        {
+            if (getstate.data_type == "state")
+            {
+                sourceCodeBuilder.AppendLine($"     public function GetState() {{");
+                sourceCodeBuilder.AppendLine($"       $this->{getstate.attribute_name};");
+                sourceCodeBuilder.AppendLine($"}}\n");
             }
 
         }
