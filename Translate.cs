@@ -9,6 +9,9 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json.Linq;
+using static xtUML1.Translate.JsonData;
+using System.Runtime.CompilerServices;
 
 namespace xtUML1
 {
@@ -18,6 +21,7 @@ namespace xtUML1
         private string status;
         private bool hasTransition;
         private string targetState;
+        string stateAttribute;
 
         public Translate()
         {
@@ -36,6 +40,8 @@ namespace xtUML1
 
                 // Example: Generate PHP code
                 GenerateNamespace(json.sub_name);
+
+                GenerateStates(json);
 
                 foreach (var model in json.model)
                 {
@@ -91,8 +97,134 @@ namespace xtUML1
             sourceCodeBuilder.AppendLine($"<?php\nnamespace {namespaceName};\n");
         }
 
+        private void GenerateStates(JsonData json)
+        {
+            // STATES START
+            foreach (JsonData.Model model in json.model)
+            {
+                var states = new List<string>();
+                if (model.states != null)
+                {
+                    foreach (JsonData.State state in model.states)
+                    {
+                        string stateAdd = state.state_name.Replace(" ", "");
+                        states.Add(stateAdd);
+                    }
+                    sourceCodeBuilder.AppendLine("   " +
+                        $"class {model.class_name}States" + " {");
+                    foreach (var state in states)
+                    {
+                        sourceCodeBuilder.AppendLine("      " +
+                            $"const {state.ToUpper()} = " + "'" + state + "'" + ";");
+                    }
+                    sourceCodeBuilder.AppendLine("   }");
+                    sourceCodeBuilder.AppendLine("");
+                }
+            }
+            // STATES END
+        }
+
+        private void GenerateStateAction(JsonData.Model model)
+        {
+            foreach (JsonData.Attribute1 attr in model.attributes)
+            {
+                if (attr.default_value != null)
+                {
+                    stateAttribute = attr.attribute_name;
+                }
+            }
+            sourceCodeBuilder.AppendLine("      " +
+                            $"public function onStateAction()");
+            sourceCodeBuilder.AppendLine("      {");
+            sourceCodeBuilder.AppendLine("           " +
+                $"switch($this->{stateAttribute})" + " {");
+            foreach (JsonData.State statess in model.states)
+            {
+                sourceCodeBuilder.AppendLine("              " +
+                    $"case {model.class_name}States::{statess.state_name.Replace(" ", "").ToUpper()}:");
+                sourceCodeBuilder.AppendLine("                  " +
+                    "// implementations code here");
+                if (statess.transitions != null)
+                {
+                    foreach (var transition in statess.transitions)
+                    {
+                        string targetState = null;
+                        foreach (JsonData.State states in model.states)
+                        {
+                            if (states.state_id == transition.target_state_id)
+                            {
+                                targetState = states.state_event.ToString();
+                            }
+                        }
+                        sourceCodeBuilder.AppendLine("                  " +
+                            $"if ({stateAttribute} == {model.class_name}States.{transition.target_state.Replace(" ", "")})");
+                        sourceCodeBuilder.AppendLine("                  {");
+                        sourceCodeBuilder.AppendLine("                      " +
+                            $"{targetState}();");
+                        sourceCodeBuilder.AppendLine("                  }");
+                    }
+                }
+                sourceCodeBuilder.AppendLine("                  " +
+                    "break;");
+            }
+            sourceCodeBuilder.AppendLine("              " +
+                    $"default:");
+            sourceCodeBuilder.AppendLine("                  " +
+                    "break;");
+            sourceCodeBuilder.AppendLine("           }");
+            sourceCodeBuilder.AppendLine("      }");
+            foreach (JsonData.State state in model.states)
+            {
+                void stateEventBuilder(string stateEvent)
+                {
+                    sourceCodeBuilder.AppendLine("");
+                    sourceCodeBuilder.AppendLine("      " +
+                        $"public function {stateEvent}()" + " {");
+                    foreach (JsonData.Attribute1 attr in model.attributes)
+                    {
+                        if (attr.data_type == "state")
+                        {
+                            sourceCodeBuilder.AppendLine("           " +
+                                    $"if ($this->{attr.attribute_name} != {model.class_name}States::{state.state_name.Replace(" ", "").ToUpper()})");
+                            sourceCodeBuilder.AppendLine("           {");
+                            sourceCodeBuilder.AppendLine("               " +
+                                $"$this->{attr.attribute_name} = {model.class_name}States::{state.state_name.Replace(" ", "").ToUpper()};");
+                            sourceCodeBuilder.AppendLine("           }");
+                        }
+                    }
+                    sourceCodeBuilder.AppendLine("      }");
+                }
+
+                if (state.state_event != null)
+                {
+                    var stateEventArray = state.state_event as JArray;
+                    if (stateEventArray != null)
+                    {
+                        foreach (var item in stateEventArray)
+                        {
+                            string stateEvent = item.ToString();
+                            if (!stateEvent.StartsWith("on", StringComparison.OrdinalIgnoreCase))
+                            {
+                                stateEventBuilder(stateEvent);
+                            }
+                        }
+                    }
+                    else if (state.state_event is string)
+                    {
+                        string stateEvent = state.state_event.ToString();
+                        stateEventBuilder(stateEvent);
+                    }
+                }
+            }
+            sourceCodeBuilder.AppendLine("");
+            sourceCodeBuilder.AppendLine($"     public function GetState()" + " {");
+            sourceCodeBuilder.AppendLine($"       $this->{stateAttribute};");
+            sourceCodeBuilder.AppendLine("      }\n");
+        }
+
         private void GenerateClass(JsonData.Model model, JsonData json)
         {
+            stateAttribute = null;
             sourceCodeBuilder.AppendLine($"class {model.class_name} {{");
 
             // Sort attributes alphabetically
@@ -128,18 +260,7 @@ namespace xtUML1
 
             if (model.states != null)
             {
-                status = StateStatus(model.attributes.FirstOrDefault(attr => attr.data_type == "state"));
-                
-                Transition(model.states, status);
-
-                // Call GenerateStateTransitionMethods with the obtained target state
-                GenerateStateTransitionMethods(model.states, status);
-
-                // Continue with the rest of the code...
-                foreach (var stateAttribute in model.attributes.Where(attr => attr.data_type == "state"))
-                {
-                    GenerateGetState(stateAttribute);
-                }
+                GenerateStateAction(model);
             }
 
             sourceCodeBuilder.AppendLine("}\n\n");
@@ -191,7 +312,7 @@ namespace xtUML1
                         {
                             if (states.state_id == attribute.state_id && states.state_name == attribute.state_name)
                             {
-                                sName = states.state_event[0];
+                                //sName = states.state_event[0];
                             }
                         }
                     }
@@ -300,17 +421,7 @@ namespace xtUML1
 
             if (imported.states != null)
             {
-                status = StateStatus(imported.attributes.FirstOrDefault(attr => attr.data_type == "state"));
-
-                Transition(imported.states, status);
-                // Call GenerateStateTransitionMethods with the obtained target state
-                GenerateStateTransitionMethods(imported.states, status);
-
-                // Continue with the rest of the code...
-                foreach (var stateAttribute in imported.attributes.Where(attr => attr.data_type == "state"))
-                {
-                    GenerateGetState(stateAttribute);
-                }
+               
             }
         }
 
@@ -450,73 +561,6 @@ namespace xtUML1
 
         }
 
-        private void GenerateGetState(JsonData.Attribute1 getstate)
-        {
-            if (getstate.data_type == "state")
-            {
-                sourceCodeBuilder.AppendLine($"     public function GetState() {{");
-                sourceCodeBuilder.AppendLine($"       $this->{getstate.attribute_name};");
-                sourceCodeBuilder.AppendLine($"}}\n");
-            }
-
-        }
-
-        private void GenerateStateTransitionMethods(List<JsonData.State> states, string status)
-        {
-            foreach (var state in states)
-            {
-                if (state.state_event != null)
-                {
-                    for (int i = 0; i < state.state_event.Length; i++)
-                    {
-                        string methodName = $"{state.state_event[i]}";
-
-                        sourceCodeBuilder.AppendLine($"    public function {methodName}() {{");
-                        sourceCodeBuilder.AppendLine($"        $this->{status} = '{state.state_value}';");
-                        sourceCodeBuilder.AppendLine($"    }}\n");
-                    }
-                }
-            }
-        }
-
-        private void Transition(List<JsonData.State> state, string status)
-        {
-            if (state.All(s => s.transitions == null || !s.transitions.Any()))
-            {
-                return;
-            }
-            sourceCodeBuilder.AppendLine($"     public function Transition() {{");
-            sourceCodeBuilder.AppendLine($"          switch (this->{status}) {{");
-            foreach (var states in state)
-            {
-                sourceCodeBuilder.AppendLine($"               case '{states.state_name}':");
-                sourceCodeBuilder.AppendLine($"                    {states.action}");
-                
-                if (states.transitions != null)
-                {
-                    foreach (var transition in states.transitions)
-                    {
-                        string targetState = null;
-
-                        foreach (var statess in state)
-                        {
-                            if (statess.state_id == transition.target_state_id)
-                            {
-                                targetState = statess.state_event[0];
-                            }
-                        }
-                        sourceCodeBuilder.AppendLine($"                    if (this->{status} == '{transition.target_state}') {{");
-                        sourceCodeBuilder.AppendLine($"                         {targetState}();");
-                        sourceCodeBuilder.AppendLine($"                    }}");
-                    }
-                }
-                sourceCodeBuilder.AppendLine($"                    break;");
-            }
-            sourceCodeBuilder.AppendLine($"          }}");
-            sourceCodeBuilder.AppendLine($"     }}");
-            sourceCodeBuilder.Append($"\n");
-        }
-
         private string Target(JsonData.Transition target)
         {
             string targetState = target.target_state; 
@@ -617,7 +661,7 @@ namespace xtUML1
                 public string state_name { get; set; }
                 public string state_value { get; set; }
                 public string state_type { get; set; }
-                public string[] state_event { get; set; }
+                public object state_event { get; set; }
                 public string[] state_function { get; set; }
                 public string[] state_transition_id { get; set; }
                 public List<Transition> transitions { get; set; }
