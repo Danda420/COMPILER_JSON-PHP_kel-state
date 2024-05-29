@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json.Linq;
-using static xtUML1.Translate.JsonData;
+using static xtUML1.JsonData;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
@@ -232,7 +232,7 @@ namespace xtUML1
 
             foreach (var attribute in model.attributes)
             {
-                GenerateAttribute(attribute,json);
+                GenerateAttribute(attribute, json);
             }
 
             sourceCodeBuilder.AppendLine("");
@@ -309,7 +309,7 @@ namespace xtUML1
                 sourceCodeBuilder.AppendLine("");
             }
             else
-            {       
+            {
                 return;
             }
 
@@ -452,7 +452,7 @@ namespace xtUML1
                 }
                 else if (attribute.data_type == "inst_ref")
                 {
-                    sourceCodeBuilder.AppendLine($"        $this->{attribute.attribute_name}Ref = ${attribute.attribute_name}Ref;"); 
+                    sourceCodeBuilder.AppendLine($"        $this->{attribute.attribute_name}Ref = ${attribute.attribute_name}Ref;");
                 }
                 else if (attribute.data_type == "inst_ref_set")
                 {
@@ -566,7 +566,7 @@ namespace xtUML1
 
         private string Target(JsonData.Transition target)
         {
-            string targetState = target.target_state; 
+            string targetState = target.target_state;
             return targetState;
         }
         private string StateStatus(JsonData.Attribute1 attributes)
@@ -620,76 +620,6 @@ namespace xtUML1
                 // Add more mappings as needed
                 default:
                     return dataType; // For unknown types, just pass through
-            }
-        }
-
-        public class JsonData
-        {
-            public string type { get; set; }
-            public string sub_id { get; set; }
-            public string sub_name { get; set; }
-            public List<Model> model { get; set; }
-            public class Model
-            {
-                public string type { get; set; }
-                public string class_id { get; set; }
-                public string class_name { get; set; }
-                public string KL { get; set; }
-                public string name { get; set; }
-                public List<Attribute1> attributes { get; set; }
-                public List<State> states { get; set; }
-                public Model model { get; set; }
-                public List<Class1> @class { get; set; }
-            }
-
-            public class Attribute1
-            {
-                public string attribute_name { get; set; }
-                public string data_type { get; set; }
-                public string default_value { get; set; }
-                public string attribute_type { get; set; }
-                public string event_id { get; set; }
-                public string event_name { get; set; }
-                public string class_id { get; set; }
-                public string state_id { get; set; }
-                public string state_name { get; set; }
-                public string related_class_id { get; set; }
-                public string related_class_name { get; set; }
-                public string related_class_KL { get; set; }
-            }
-
-            public class State
-            {
-                public string state_id { get; set; }
-                public string state_name { get; set; }
-                public string state_value { get; set; }
-                public string state_type { get; set; }
-                public object state_event { get; set; }
-                public string[] state_function { get; set; }
-                public string[] state_transition_id { get; set; }
-                public List<Transition> transitions { get; set; }
-                public string action { get; set;} 
-            }
-         
-            public class Class1
-            {
-                public string class_name { get; set; }
-                public string class_multiplicity { get; set; }
-                public List<Attribute> attributes { get; set; }
-                public List<Class1> @class { get; set; }
-            }
-
-            public class Attribute
-            {
-                public string attribute_name { get; set; }
-                public string data_type { get; set; }
-                public string attribute_type { get; set; }
-            }
-
-            public class Transition
-            {
-                public string target_state_id { get; set; }
-                public string target_state { get; set; }
             }
         }
     }
