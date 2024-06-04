@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using static xtUML1.JsonData;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
+using System.Text.RegularExpressions;
 
 namespace xtUML1
 {
@@ -149,19 +150,22 @@ namespace xtUML1
                 {
                     foreach (var transition in statess.transitions)
                     {
+                        string targetStateRAW = null;
                         string targetState = null;
+                        string pattern = @"\[\s*""([^""]+)""\s*\]";
                         foreach (JsonData.State states in model.states)
                         {
                             if (states.state_id == transition.target_state_id)
                             {
-                                targetState = states.state_event.ToString();
+                                targetStateRAW = states.state_event.ToString();
+                                Match match = Regex.Match(targetStateRAW, pattern);
+                                targetState = match.Groups[1].Value;
                             }
                         }
                         sourceCodeBuilder.AppendLine("                  " +
-                            $"if ({stateAttribute} == {model.class_name}States.{transition.target_state.Replace(" ", "")})");
-                        sourceCodeBuilder.AppendLine("                  {");
+                            $"if ($this->{stateAttribute} == {model.class_name}States::{transition.target_state.Replace(" ", "").ToUpper()}) {{");
                         sourceCodeBuilder.AppendLine("                      " +
-                            $"{targetState}();");
+                            $"$this->{targetState}();");
                         sourceCodeBuilder.AppendLine("                  }");
                     }
                 }
