@@ -150,22 +150,10 @@ namespace xtUML1
                 {
                     foreach (var transition in statess.transitions)
                     {
-                        string targetStateRAW = null;
-                        string targetState = null;
-                        string pattern = @"\[\s*""([^""]+)""\s*\]";
-                        foreach (JsonData.State states in model.states)
-                        {
-                            if (states.state_id == transition.target_state_id)
-                            {
-                                targetStateRAW = states.state_event.ToString();
-                                Match match = Regex.Match(targetStateRAW, pattern);
-                                targetState = match.Groups[1].Value;
-                            }
-                        }
                         sourceCodeBuilder.AppendLine("                  " +
                             $"if ($this->{stateAttribute} == {model.class_name}States::{transition.target_state.Replace(" ", "").ToUpper()}) {{");
                         sourceCodeBuilder.AppendLine("                      " +
-                            $"$this->{targetState}();");
+                            $"$this->{transition.target_state_event}();");
                         sourceCodeBuilder.AppendLine("                  }");
                     }
                 }
@@ -291,7 +279,7 @@ namespace xtUML1
             }
             else if (attribute.data_type == "inst_ref_set")
             {
-                sourceCodeBuilder.AppendLine($"    private {attribute.related_class_name} ${attribute.attribute_name}RefSet = [];");
+                sourceCodeBuilder.AppendLine($"    private {attribute.related_class_name} ${attribute.attribute_name}RefSet;");
             }
             else if (attribute.data_type == "inst_event")
             {
@@ -305,7 +293,7 @@ namespace xtUML1
                     }
                 }
                 sourceCodeBuilder.AppendLine("      " +
-                    $"public void {attribute.event_name}({cName} ${cName})" + " {");
+                    $"public function {attribute.event_name}({cName} ${cName})" + " {");
                 sourceCodeBuilder.AppendLine("         " +
                     $"${cName}->status = {cName}States::{attribute.state_name};");
                 sourceCodeBuilder.AppendLine("      " +
@@ -413,6 +401,7 @@ namespace xtUML1
                 sourceCodeBuilder.AppendLine("");
                 GenerateStateAction(imported);
             }
+            sourceCodeBuilder.AppendLine("}\n\n");
         }
 
         private void GenerateConstructor(List<JsonData.Attribute1> attributes, string className)
@@ -427,15 +416,15 @@ namespace xtUML1
                 }
                 else if (attribute.data_type == "inst_ref_<timer>")
                 {
-                    sourceCodeBuilder.Append($"TIMER {attribute.attribute_name},");
+                    sourceCodeBuilder.Append($"TIMER ${attribute.attribute_name},");
                 }
                 else if (attribute.data_type == "inst_ref")
                 {
-                    sourceCodeBuilder.Append($"{attribute.related_class_name} {attribute.attribute_name}Ref,");
+                    sourceCodeBuilder.Append($"{attribute.related_class_name} ${attribute.attribute_name}Ref,");
                 }
                 else if (attribute.data_type == "inst_ref_set")
                 {
-                    sourceCodeBuilder.Append($"{attribute.related_class_name} {attribute.attribute_name}RefSet,");
+                    sourceCodeBuilder.Append($"{attribute.related_class_name} ${attribute.attribute_name}RefSet,");
                 }
 
             }
@@ -460,11 +449,11 @@ namespace xtUML1
                 }
                 else if (attribute.data_type == "inst_ref_set")
                 {
-                    sourceCodeBuilder.AppendLine($"        $this->{attribute.attribute_name}RefSet[] = ${attribute.attribute_name}RefSet;");
+                    sourceCodeBuilder.AppendLine($"        $this->{attribute.attribute_name}RefSet = ${attribute.attribute_name}RefSet;");
                 }
                 else if (attribute.data_type == "inst_ref_<timer>")
                 {
-                    sourceCodeBuilder.AppendLine($"        $this->{attribute.attribute_name} = ${attribute.attribute_name}");
+                    sourceCodeBuilder.AppendLine($"        $this->{attribute.attribute_name} = ${attribute.attribute_name};");
                 }
                 else if (attribute.default_value != null)
                 {
@@ -547,7 +536,7 @@ namespace xtUML1
             else if (setter.data_type == "inst_ref_set")
             {
                 sourceCodeBuilder.AppendLine($"      public function set{setter.attribute_name}RefSet({setter.related_class_name} ${setter.attribute_name}) {{");
-                sourceCodeBuilder.AppendLine($"        $this->{setter.attribute_name}RefSet[] = ${setter.attribute_name};");
+                sourceCodeBuilder.AppendLine($"        $this->{setter.attribute_name}RefSet = ${setter.attribute_name};");
                 sourceCodeBuilder.AppendLine($"      }}");
             }
             else if (setter.data_type == "inst_event")

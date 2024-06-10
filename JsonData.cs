@@ -73,6 +73,7 @@ namespace xtUML1
         {
             public string target_state_id { get; set; }
             public string target_state { get; set; }
+            public string target_state_event { get; set; }
         }
     }
 }
