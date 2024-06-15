@@ -210,7 +210,7 @@ namespace xtUML1
             }
             sourceCodeBuilder.AppendLine("");
             sourceCodeBuilder.AppendLine($"     public function GetState()" + " {");
-            sourceCodeBuilder.AppendLine($"       $this->{stateAttribute};");
+            sourceCodeBuilder.AppendLine($"       return $this->{stateAttribute};");
             sourceCodeBuilder.AppendLine("      }");
         }
 
