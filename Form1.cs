@@ -149,14 +149,62 @@ namespace xtUML1
 
             btnCheck_Click1(sender, e);
 
+            Parsing.Point21(this, jsonArray);
+            Parsing.Point22(this, jsonArray);
+
             Parsing.Point25(this, jsonArray);
             Parsing.Point27(this, jsonArray);
             Parsing.Point28(this, jsonArray);
             Parsing.Point29(this, jsonArray);
             Parsing.Point30(this, jsonArray);
+
+            Parsing.Point31(this, jsonArray);
+            Parsing.Point32(this, jsonArray);   
+            Parsing.Point33(this, jsonArray);
+
             Parsing.Point34(this, jsonArray);
             Parsing.Point35(this, jsonArray);
+
             Parsing.Point99(this, jsonArray);
+
+            Parsing.Point36(this, jsonArray);
+            Parsing.Point37(this, jsonArray);
+            Parsing.Point38(this, jsonArray);
+            Parsing.Point39(this, jsonArray);
+            Parsing.Point40(this, jsonArray);
+            Parsing.Point41(this, jsonArray);
+            Parsing.Point42(this, jsonArray);
+            Parsing.Point43(this, jsonArray);
+            Parsing.Point44(this, jsonArray);
+            Parsing.Point45(this, jsonArray);
+            Parsing.Point46(this, jsonArray);
+            Parsing.Point47(this, jsonArray);
+            Parsing.Point48(this, jsonArray);
+            Parsing.Point49(this, jsonArray);
+            Parsing.Point50(this, jsonArray);
+            Parsing.Point51(this, jsonArray);
+            Parsing.Point52(this, jsonArray);
+            Parsing.Point53(this, jsonArray);
+            Parsing.Point54(this, jsonArray);
+
+            Parsing.Point55(this, jsonArray);
+            Parsing.Point56(this, jsonArray);
+            Parsing.Point57(this, jsonArray);
+            Parsing.Point58(this, jsonArray);
+            Parsing.Point59(this, jsonArray);
+            Parsing.Point60(this, jsonArray);
+            Parsing.Point61(this, jsonArray);
+            Parsing.Point62(this, jsonArray);
+            Parsing.Point63(this, jsonArray);
+            Parsing.Point64(this, jsonArray);
+            Parsing.Point65(this, jsonArray);
+            Parsing.Point66(this, jsonArray);
+            Parsing.Point67(this, jsonArray);
+            Parsing.Point68(this, jsonArray);
+            Parsing.Point69(this, jsonArray);
+            Parsing.Point70(this, jsonArray);
+            Parsing.Point71(this, jsonArray);
+            Parsing.Point72(this, jsonArray);
 
             if (string.IsNullOrWhiteSpace(textBox4.Text))
             {
@@ -394,7 +442,7 @@ namespace xtUML1
                     }
                 }
 
-                ValidateTimerModel(jsonObj, usedKeyLetters);
+                //ValidateTimerModel(jsonObj, usedKeyLetters);
             }
             catch (Exception ex)
             {
