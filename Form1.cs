@@ -24,11 +24,12 @@ namespace xtUML1
         private string[] fileNames;
         private bool isJsonFileSelected = false;
         private Translate translator;
-        private bool parsed = true; 
+        private bool parsed = true;
+        private Visualize_State visualizeState;
         public Form1()
         {
             InitializeComponent();
-
+            visualizeState = new Visualize_State();
             openFileDialog = new OpenFileDialog();
             saveFileDialog = new SaveFileDialog();
             translator = new Translate();
@@ -173,6 +174,7 @@ namespace xtUML1
 
         private void btnTranslate_Click(object sender, EventArgs e)
         {
+            tableLayoutPanel1.BringToFront();
             // translate jika lolos parsing
             // tampilkan hasil translate di textBox3
 
@@ -203,16 +205,18 @@ namespace xtUML1
             {
                 MessageBox.Show("JSON model is not successfully parsed", "Alert", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            
+         
         }
 
 
         private void button3_Click(object sender, EventArgs e)
         {
             // tulis method untuk menghapus nilai textBox1 (selected file)
+            tableLayoutPanel2.SendToBack();
             textBox1.Clear();
             textBox3.Clear();
             textBox4.Clear();
+            panel.Controls.Clear();
             isJsonFileSelected = false; // Reset the flag indicating whether a JSON file is selected
             selectedFilePath = null; // Reset the selected file path
             fileNames = null;
@@ -277,8 +281,8 @@ namespace xtUML1
 
             if (textBox3.TextLength > 0)
             {
-                saveFileDialog.Filter = "C++ files (*.cpp)|*.cpp|All files (*.*)|*.*"; // ubah ekstensi output save file
-                saveFileDialog.Title = "Save C++ File"; // ubah C++
+                saveFileDialog.Filter = "PHP files (*.php)|*.php|All files (*.*)|*.*";
+                saveFileDialog.Title = "Save PHP File";
 
                 DialogResult result = saveFileDialog.ShowDialog();
 
@@ -301,10 +305,30 @@ namespace xtUML1
             }
         }
 
+        //visualize state
         private void btnVisualize_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("We are sorry, this feature is not available right now.", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            return;
+            // Ensure a JSON file is selected
+            if (!isJsonFileSelected)
+            {
+                MessageBox.Show("Select JSON file as an input first!", "Alert", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                tableLayoutPanel2.Visible = true;
+                tableLayoutPanel2.BringToFront();
+                // Call the Visualize method of Visualize_State, passing the JSON file path and panel1
+                visualizeState.Visualize(selectedFilePath,panel);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            //MessageBox.Show("We are sorry, this feature is not available right now.", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //return;
         }
 
         private void btnSimulate_Click(object sender, EventArgs e)
@@ -553,6 +577,16 @@ namespace xtUML1
                     }
                 }
             }
+        }
+
+        private void panel_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

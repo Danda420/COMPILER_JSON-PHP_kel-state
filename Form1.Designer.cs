@@ -1,4 +1,4 @@
-﻿namespace xtUML1
+namespace xtUML1
 {
     partial class Form1
     {
@@ -45,7 +45,14 @@
             this.label5 = new System.Windows.Forms.Label();
             this.btnParse = new System.Windows.Forms.Button();
             this.btnTranslate = new System.Windows.Forms.Button();
+            this.panel3 = new System.Windows.Forms.Panel();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.panel = new System.Windows.Forms.Panel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -102,6 +109,7 @@
             this.label2.TabIndex = 9;
             this.label2.Text = "JSON";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // textBox3
             // 
@@ -295,6 +303,77 @@
             this.btnTranslate.UseVisualStyleBackColor = false;
             this.btnTranslate.Click += new System.EventHandler(this.btnTranslate_Click);
             // 
+            // panel3
+            // 
+            this.panel3.Location = new System.Drawing.Point(381, 90);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(512, 300);
+            this.panel3.TabIndex = 25;
+            // 
+            // tableLayoutPanel2
+            // 
+            this.tableLayoutPanel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel2.ColumnCount = 2;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel2.Controls.Add(this.panel1, 0, 1);
+            this.tableLayoutPanel2.Controls.Add(this.label7, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.label6, 1, 0);
+            this.tableLayoutPanel2.Controls.Add(this.panel, 1, 1);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(294, 330);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 2;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 3.901047F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 96.09895F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(1639, 1059);
+            this.tableLayoutPanel2.TabIndex = 26;
+            this.tableLayoutPanel2.Visible = false;
+            // 
+            // label7
+            // 
+            this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label7.BackColor = System.Drawing.Color.Black;
+            this.label7.Font = new System.Drawing.Font("Arial", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.ForeColor = System.Drawing.Color.White;
+            this.label7.Location = new System.Drawing.Point(3, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(813, 40);
+            this.label7.TabIndex = 26;
+            this.label7.Text = "Class Diagram";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label6
+            // 
+            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label6.BackColor = System.Drawing.Color.Black;
+            this.label6.Font = new System.Drawing.Font("Arial", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.ForeColor = System.Drawing.Color.White;
+            this.label6.Location = new System.Drawing.Point(822, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(814, 40);
+            this.label6.TabIndex = 26;
+            this.label6.Text = "State Diagram";
+            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // panel
+            // 
+            this.panel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel.BackColor = System.Drawing.Color.White;
+            this.panel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.panel.Font = new System.Drawing.Font("Arial", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.panel.Location = new System.Drawing.Point(822, 44);
+            this.panel.Name = "panel";
+            this.panel.Size = new System.Drawing.Size(814, 1012);
+            this.panel.TabIndex = 1;
+            this.panel.TabStop = true;
+            this.panel.Paint += new System.Windows.Forms.PaintEventHandler(this.panel_Paint);
+            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -316,12 +395,27 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(1639, 1059);
             this.tableLayoutPanel1.TabIndex = 24;
             // 
+            // panel1
+            // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.BackColor = System.Drawing.Color.White;
+            this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.panel1.Font = new System.Drawing.Font("Arial", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.panel1.Location = new System.Drawing.Point(3, 44);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(813, 1012);
+            this.panel1.TabIndex = 27;
+            this.panel1.TabStop = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.LightGray;
             this.ClientSize = new System.Drawing.Size(1974, 1429);
+            this.Controls.Add(this.tableLayoutPanel2);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.btnTranslate);
             this.Controls.Add(this.btnParse);
@@ -337,11 +431,14 @@
             this.Controls.Add(this.button3);
             this.Controls.Add(this.textBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Location = new System.Drawing.Point(200, 50);
+            this.MinimumSize = new System.Drawing.Size(2000, 1500);
             this.Name = "Form1";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "xtUML Model Compiler";
+            this.Text = "  xtUML Model Compiler";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -366,7 +463,13 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button btnParse;
         private System.Windows.Forms.Button btnTranslate;
+        private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Panel panel;
+        private System.Windows.Forms.Panel panel1;
     }
 }
 

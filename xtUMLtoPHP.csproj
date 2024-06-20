@@ -33,6 +33,84 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MindFusion.Barcodes, Version=1.0.3.450, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Barcodes.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Common, Version=1.3.8.450, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Common.WinForms, Version=1.0.4.452, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Common.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming, Version=7.0.2.451, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Diagramming.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming.EffectsProvider, Version=7.0.2.450, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Diagramming.EffectsProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming.Export.Dxf, Version=7.0.2.450, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Diagramming.Export.Dxf.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming.Export.Excel, Version=7.0.2.450, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Diagramming.Export.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming.Export.Pdf, Version=7.0.2.450, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Diagramming.Export.Pdf.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming.Export.Svg, Version=7.0.2.450, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Diagramming.Export.Svg.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming.Export.Swf, Version=7.0.2.450, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Diagramming.Export.Swf.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming.Export.Visio, Version=7.0.2.450, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Diagramming.Export.Visio.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming.Export.Wmf, Version=7.0.2.450, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Diagramming.Export.Wmf.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming.Import.Draw, Version=7.0.2.450, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Diagramming.Import.Draw.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming.Import.Svg, Version=7.0.2.450, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Diagramming.Import.Svg.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming.Import.Visio, Version=7.0.2.450, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Diagramming.Import.Visio.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming.WinForms, Version=7.0.2.451, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Diagramming.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Diagramming.WinForms.Controls, Version=7.0.2.450, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Diagramming.WinForms.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Graphs, Version=2.3.3.451, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Graphs.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Licensing, Version=1.0.6.400, Culture=neutral, PublicKeyToken=9d02e21d957ddaef, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Licensing.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Mapping, Version=2.0.3.451, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Mapping.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Pdf, Version=1.3.2.451, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Pdf.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Scripting, Version=1.0.3.452, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Scripting.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Svg, Version=1.2.4.451, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Svg.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Swf, Version=1.0.2.452, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Swf.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Vsx, Version=1.0.4.451, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Vsx.dll</HintPath>
+    </Reference>
+    <Reference Include="MindFusion.Zip, Version=1.0.1.451, Culture=neutral, PublicKeyToken=dd7449df9ffcc455, processorArchitecture=MSIL">
+      <HintPath>packages\MindFusion.Diagramming.7.0.2\lib\net45\MindFusion.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -60,6 +138,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Translate.cs" />
+    <Compile Include="Visualize State.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
