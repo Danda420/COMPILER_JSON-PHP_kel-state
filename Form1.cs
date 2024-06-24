@@ -26,10 +26,14 @@ namespace xtUML1
         private Translate translator;
         private bool parsed = true;
         private Visualize_State visualizeState;
+        private VisualizeClass visualizeClass;
+
         public Form1()
         {
             InitializeComponent();
             visualizeState = new Visualize_State();
+            visualizeClass = new VisualizeClass();
+
             openFileDialog = new OpenFileDialog();
             saveFileDialog = new SaveFileDialog();
             translator = new Translate();
@@ -365,18 +369,20 @@ namespace xtUML1
 
             try
             {
+                tableLayoutPanel1.Visible = true;
                 tableLayoutPanel2.Visible = true;
+
+                tableLayoutPanel1.BringToFront();
                 tableLayoutPanel2.BringToFront();
-                // Call the Visualize method of Visualize_State, passing the JSON file path and panel1
-                visualizeState.Visualize(selectedFilePath,panel);
+                visualizeState.Visualize(selectedFilePath, panel);
+                visualizeClass.VisualiseJson(textBox4.Text, panel1);
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            //MessageBox.Show("We are sorry, this feature is not available right now.", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //return;
         }
 
         private void btnSimulate_Click(object sender, EventArgs e)

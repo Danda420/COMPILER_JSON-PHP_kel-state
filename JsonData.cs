@@ -23,6 +23,11 @@ namespace xtUML1
             public List<State> states { get; set; }
             public Model model { get; set; }
             public List<Class1> @class { get; set; }
+            public List<Attribute1> Attributes { get; set; }
+
+
+
+
         }
 
         public class Attribute1
@@ -61,7 +66,38 @@ namespace xtUML1
             public List<Attribute> attributes { get; set; }
             public List<Class1> @class { get; set; }
         }
+        public class ClassModel
+        {
+            public string ClassId { get; set; }
+            public string ClassName { get; set; }
+            public string KL { get; set; }
+            public List<AttributeModel> Attributes { get; set; }
+        }
 
+        public class AttributeModel
+        {
+            public string AttributeType { get; set; }
+            public string AttributeName { get; set; }
+            public string DataType { get; set; }
+            public string RoleName { get; set; }
+
+        }
+
+        public class AssociationModel
+        {
+            public string Name { get; set; }
+            public List<AssocClass> Classes { get; set; }
+            public ClassModel AssociationClass { get; set; }
+        }
+
+        public class AssocClass
+        {
+            public string ClassId { get; set; }
+            public string ClassName { get; set; }
+            public string Multiplicity { get; set; }
+            public string RoleName { get; set; }
+
+        }
         public class Attribute
         {
             public string attribute_name { get; set; }
