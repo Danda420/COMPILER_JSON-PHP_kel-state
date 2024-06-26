@@ -14,6 +14,7 @@ using static xtUML1.JsonData;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
+using static System.Windows.Forms.AxHost;
 
 namespace xtUML1
 {
@@ -43,8 +44,17 @@ namespace xtUML1
                 // Example: Generate PHP code
                 GenerateNamespace(json.sub_name);
 
-                GenerateStates(json);
-
+                foreach (JsonData.Model model in json.model)
+                {
+                    GenerateStates(model);
+                }
+                foreach (var model in json.model)
+                {
+                    if (model.type == "association" && model.model != null)
+                    {
+                        GenerateStates(model.model);
+                    }
+                }
                 foreach (var model in json.model)
                 {
                     if (model.type == "class")
@@ -99,31 +109,26 @@ namespace xtUML1
             sourceCodeBuilder.AppendLine($"<?php\nnamespace {namespaceName};\n");
         }
 
-        private void GenerateStates(JsonData json)
+        private void GenerateStates(JsonData.Model model)
         {
-            // STATES START
-            foreach (JsonData.Model model in json.model)
+            var states = new List<string>();
+            if (model.states != null)
             {
-                var states = new List<string>();
-                if (model.states != null)
+                foreach (JsonData.State state in model.states)
                 {
-                    foreach (JsonData.State state in model.states)
-                    {
-                        string stateAdd = state.state_name.Replace(" ", "");
-                        states.Add(stateAdd);
-                    }
-                    sourceCodeBuilder.AppendLine("   " +
-                        $"class {model.class_name}States" + " {");
-                    foreach (var state in states)
-                    {
-                        sourceCodeBuilder.AppendLine("      " +
-                            $"const {state.ToUpper()} = " + "'" + state + "'" + ";");
-                    }
-                    sourceCodeBuilder.AppendLine("   }");
-                    sourceCodeBuilder.AppendLine("");
+                    string stateAdd = state.state_name.Replace(" ", "");
+                    states.Add(stateAdd);
                 }
+                sourceCodeBuilder.AppendLine("   " +
+                    $"class {model.class_name}States" + " {");
+                foreach (var state in states)
+                {
+                    sourceCodeBuilder.AppendLine("      " +
+                        $"const {state.ToUpper()} = " + "'" + state + "'" + ";");
+                }
+                sourceCodeBuilder.AppendLine("   }");
+                sourceCodeBuilder.AppendLine("");
             }
-            // STATES END
         }
 
         private void GenerateStateAction(JsonData.Model model)
@@ -347,6 +352,12 @@ namespace xtUML1
             if (associationModel.attributes != null)
             {
                 GenerateConstructor(associationModel.attributes, associationModel.class_name);
+            }
+
+            if (associationModel.states != null)
+            {
+                sourceCodeBuilder.AppendLine("");
+                GenerateStateAction(associationModel);
             }
 
             foreach (var attribute in associationModel.attributes)

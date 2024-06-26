@@ -23,11 +23,6 @@ namespace xtUML1
             public List<State> states { get; set; }
             public Model model { get; set; }
             public List<Class1> @class { get; set; }
-            public List<Attribute1> Attributes { get; set; }
-
-
-
-
         }
 
         public class Attribute1
@@ -66,6 +61,7 @@ namespace xtUML1
             public List<Attribute> attributes { get; set; }
             public List<Class1> @class { get; set; }
         }
+
         public class ClassModel
         {
             public string ClassId { get; set; }
