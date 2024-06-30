@@ -4,6 +4,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 
@@ -226,6 +227,12 @@ namespace xtUML1
 
                 foreach (var subsystem in jsonArray)
                 {
+                    if (subsystem["model"] == null)
+                    {
+                        textBox4.AppendText("Syntax error point 3: Model not found\r\n");
+
+                        return false;
+                    }
                     foreach (var item in subsystem["model"])
                     {
                         if (!processItem(item))
@@ -2015,6 +2022,7 @@ namespace xtUML1
                             {
                                 foreach (var state in states)
                                 {
+                                    Debug.WriteLine("line 221");
                                     var stateEvents = state["state_event"] as JArray;
                                     if (stateEvents != null)
                                     {
@@ -2039,6 +2047,7 @@ namespace xtUML1
                         foreach (var element in ocm)
                         {
                             var elementEvents = element["events"] as JArray;
+                            Debug.WriteLine("sada" + elementEvents);
                             if (elementEvents != null)
                             {
                                 foreach (var evt in elementEvents)
@@ -2887,18 +2896,21 @@ namespace xtUML1
                     {
                         foreach (var element in model)
                         {
-                            if (element["type"]?.ToString() == "dataStore")
+                            if (element["typedata"]?.ToString() == "dataStore")
                             {
+
                                 var dataStoreId = element["dataStoreId"]?.ToString();
 
                                 if (dataStoreIds.Contains(dataStoreId))
                                 {
+
                                     // If the data store is already encountered, it's appearing multiple times
                                     textBox4.AppendText($"Success 45: Data store '{dataStoreId}' appears in multiple places within the process model(s).\r\n");
                                     return true;
                                 }
                                 else
                                 {
+
                                     // Add the data store ID to the HashSet
                                     dataStoreIds.Add(dataStoreId);
                                 }
@@ -2916,6 +2928,7 @@ namespace xtUML1
                 textBox4.AppendText("Syntax error 45: " + ex.Message + "\r\n");
                 return false;
             }
+
         }
         public static bool Point46(Form1 form1, JArray jsonArray)
         {
@@ -3650,6 +3663,7 @@ namespace xtUML1
         public static bool Point58(Form1 form1, JArray jsonArray)
         {
             RichTextBox textBox4 = form1.GetMessageBox();
+
             try
             {
                 var dataStores = new HashSet<string>();
@@ -3660,14 +3674,15 @@ namespace xtUML1
                 {
                     foreach (var item in subsystem["model"])
                     {
-                        var itemType = item["type"]?.ToString();
+                        var itemType = item["typedata"]?.ToString();
 
-                        if (itemType == "data_store")
+                        if (itemType == "dataStore")
                         {
                             var storeName = item["store_name"]?.ToString();
                             if (!string.IsNullOrWhiteSpace(storeName))
                             {
                                 dataStores.Add(storeName);
+                                Debug.WriteLine($"DataStore : {storeName}");
                             }
                         }
                         else if (itemType == "control_store")
@@ -3698,14 +3713,16 @@ namespace xtUML1
                                 foreach (var state in states)
                                 {
                                     var stateName = state["state_name"]?.ToString();
+                                    var stateId = state["state_id"]?.ToString();
                                     var stateEvents = state["state_event"] as JArray;
                                     var eventData = state["event_data"] as JArray;
 
                                     if (stateEvents != null)
                                     {
+
                                         if (eventData == null)
                                         {
-                                            textBox4.AppendText($"Syntax error 58: State {stateName} of class {className} has events but no event data defined. \r\n");
+                                            textBox4.AppendText($"Syntax error 58: State {stateName} with id {stateId} of class {className} has events but no event data defined. \r\n");
                                             return false;
                                         }
 
@@ -3713,12 +3730,16 @@ namespace xtUML1
                                         {
                                             var eventName = stateEvent?.ToString();
 
+
                                             foreach (var data in eventData)
                                             {
                                                 var dataName = data.ToString();
-                                                if (!dataStores.Contains(dataName) && !controlStores.Contains(dataName))
+                                                Debug.WriteLine($"dn : {dataName}");
+                                                controlStores.ToList<String>().ForEach(x => Debug.WriteLine($"dns : {x}"));
+
+                                                if (!dataStores.First().Contains(dataName) && !controlStores.Contains(dataName))
                                                 {
-                                                    textBox4.AppendText($"Syntax error 58: Event data {dataName} for event {eventName} in state {stateName} of class {className} is not available. \r\n");
+                                                    textBox4.AppendText($"Syntax error 58: Event data {dataName} for event {eventName} in state {stateName} of class {className} is not available on {String.Join(",", dataStores)} or on .{String.Join(",", controlStores)} \r\n");
                                                     return false;
                                                 }
                                             }
@@ -3726,7 +3747,7 @@ namespace xtUML1
                                     }
                                     else
                                     {
-                                        textBox4.AppendText($"Syntax error 58: State {stateName} of class {className} has no events defined. \r\n");
+                                        textBox4.AppendText($"Syntax error 58: State {stateName} of class {className} has no events defined. 2 \r\n");
                                         return false;
                                     }
                                 }
@@ -4685,9 +4706,10 @@ namespace xtUML1
                 }
 
                 // Find communication model and check subsystems
-                var communicationModel = jsonArray.FirstOrDefault(x => x["type"]?.ToString() == "communication_model"); // Tanda 1: Menambahkan pencarian untuk communication_model
+                var communicationModel = jsonArray[0]["model"].FirstOrDefault(x => x["type"]?.ToString() == "subsystem_communication_model");
                 if (communicationModel != null)
                 {
+                    Debug.WriteLine(communicationModel.ToString()); // Tanda 1: Menambahkan pencarian untuk communication_model
                     var subsystemsArray = communicationModel["subsystems"] as JArray; // Tanda 2: Mengambil array subsystems dari communication_model
                     if (subsystemsArray != null)
                     {
