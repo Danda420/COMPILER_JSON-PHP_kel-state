@@ -15,6 +15,11 @@ using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
 using static System.Windows.Forms.AxHost;
+using System.Net.Configuration;
+using System.Reflection;
+using System.Diagnostics.Eventing.Reader;
+using MindFusion.Graphs;
+using System.Runtime.InteropServices;
 
 namespace xtUML1
 {
@@ -44,26 +49,23 @@ namespace xtUML1
                 // Example: Generate PHP code
                 GenerateNamespace(json.sub_name);
 
-                foreach (JsonData.Model model in json.model)
-                {
-                    GenerateStates(model);
-                }
+                // Generate Generalized States
+                GenerateStates(json);
+                GenerateStateExtends(json);
+
                 foreach (var model in json.model)
                 {
-                    if (model.type == "association" && model.model != null)
+                    if (model.type == "superclass")
                     {
-                        GenerateStates(model.model);
+                        GenerateSuperclass(model, json);
                     }
-                }
-                foreach (var model in json.model)
-                {
                     if (model.type == "class")
                     {
                         GenerateClass(model, json);
                     }
                     else if (model.type == "association" && model.model != null)
                     {
-                        GenerateAssociationClass(model.model);
+                        GenerateAssociationClass(model.model, json);
                     }
 
                     if (model.type == "imported_class")
@@ -109,27 +111,67 @@ namespace xtUML1
             sourceCodeBuilder.AppendLine($"<?php\nnamespace {namespaceName};\n");
         }
 
-        private void GenerateStates(JsonData.Model model)
+        private void GenerateStates(JsonData json)
         {
-            var states = new List<string>();
-            if (model.states != null)
+            var states = new HashSet<string>();
+            sourceCodeBuilder.AppendLine("   " +
+                    $"class baseState" + " {");
+            foreach (JsonData.Model model in json.model)
             {
-                foreach (JsonData.State state in model.states)
+                if (model.states != null)
                 {
-                    string stateAdd = state.state_name.Replace(" ", "");
-                    states.Add(stateAdd);
+                    foreach (JsonData.State state in model.states)
+                    {
+                        string stateAdd = state.state_name.Replace(" ", "");
+                        states.Add(stateAdd);
+                    }
                 }
-                sourceCodeBuilder.AppendLine("   " +
-                    $"class {model.class_name}States" + " {");
-                foreach (var state in states)
+                if (model.model != null && model.model.states != null)
                 {
-                    sourceCodeBuilder.AppendLine("      " +
-                        $"const {state.ToUpper()} = " + "'" + state + "'" + ";");
+                    foreach (JsonData.State state in model.model.states)
+                    {
+                        string stateAdd = state.state_name.Replace(" ", "");
+                        states.Add(stateAdd);
+                    }
                 }
-                sourceCodeBuilder.AppendLine("   }");
-                sourceCodeBuilder.AppendLine("");
             }
+            foreach (var state in states)
+            {
+                sourceCodeBuilder.AppendLine("      " +
+                    $"const {state.ToUpper()} = " + "'" + state + "'" + ";");
+            }
+            sourceCodeBuilder.AppendLine("   }");
+            sourceCodeBuilder.AppendLine("");
         }
+
+        private void GenerateStateExtends(JsonData json)
+        {
+            foreach (JsonData.Model model in json.model)
+            {
+                if (model.attributes != null)
+                {
+                    foreach (JsonData.Attribute1 attribute in model.attributes)
+                    {
+                        if (attribute.data_type == "state" && model.class_name != null)
+                        {
+                            sourceCodeBuilder.AppendLine($"   class {model.class_name}States extends baseState" + " {}");
+                        }
+                    }
+                }
+                if (model.model != null && model.model.attributes != null)
+                {
+                    foreach (JsonData.Attribute1 attribute in model.model.attributes)
+                    {
+                        if (attribute.data_type == "state" && model.model.class_name != null)
+                        {
+                            sourceCodeBuilder.AppendLine($"   class {model.model.class_name}States extends baseState" + " {}");
+                        }
+                    }
+                }
+            }
+            sourceCodeBuilder.AppendLine("");
+        }
+
 
         private void GenerateStateAction(JsonData.Model model)
         {
@@ -213,16 +255,103 @@ namespace xtUML1
                     }
                 }
             }
+        }
+
+        private void GenerateSuperclass (JsonData.Model model, JsonData json)
+        {
+            sourceCodeBuilder.AppendLine($"abstract class {model.superclass_name} {{");
+            foreach (var supclassattr in model.attributes)
+            {
+                string dataType = MapDataType(supclassattr.data_type);
+                if (supclassattr.data_type != "state" && supclassattr.data_type != "inst_event" && supclassattr.data_type != "inst_ref" && supclassattr.data_type != "inst_ref_set" && supclassattr.data_type != "inst_ref_<timer>" && supclassattr.data_type != "inst_event")
+                {
+                    sourceCodeBuilder.AppendLine($"      protected {dataType} ${supclassattr.attribute_name};");
+                }
+                else if (supclassattr.data_type == "state")
+                {
+                    sourceCodeBuilder.AppendLine($"      protected ${supclassattr.attribute_name};");
+                }
+                else if (supclassattr.data_type == "inst_ref_<timer>")
+                {
+                    sourceCodeBuilder.AppendLine($"      protected {dataType} ${supclassattr.attribute_name};");
+                }
+                else if (supclassattr.data_type == "inst_ref")
+                {
+                    sourceCodeBuilder.AppendLine($"      protected {supclassattr.related_class_name} ${supclassattr.attribute_name}Ref;");
+                }
+                else if (supclassattr.data_type == "inst_ref_set")
+                {
+                    sourceCodeBuilder.AppendLine($"      protected {supclassattr.related_class_name} ${supclassattr.attribute_name}RefSet;");
+                }
+                else if (supclassattr.data_type == "inst_event")
+                {
+                    sourceCodeBuilder.AppendLine("");
+                    string cName = null;
+                    foreach (JsonData.Model modell in json.model)
+                    {
+                        if (modell.class_id == supclassattr.class_id)
+                        {
+                            cName = modell.class_name;
+                        }
+                    }
+                    sourceCodeBuilder.AppendLine("      " +
+                        $"protected function {supclassattr.event_name}({cName} ${cName})" + " {");
+                    sourceCodeBuilder.AppendLine("         " +
+                        $"${cName}->status = {cName}States::{supclassattr.state_name.Replace(" ", "").ToUpper()};");
+                    sourceCodeBuilder.AppendLine("      " +
+                        "}");
+                    sourceCodeBuilder.AppendLine("");
+                }
+            }
             sourceCodeBuilder.AppendLine("");
-            sourceCodeBuilder.AppendLine($"     public function GetState()" + " {");
-            sourceCodeBuilder.AppendLine($"       return $this->{stateAttribute};");
-            sourceCodeBuilder.AppendLine("      }");
+            foreach (var supclassattr in model.attributes)
+            {
+                sourceCodeBuilder.AppendLine($"      public function get{supclassattr.attribute_name}() {{");
+                sourceCodeBuilder.AppendLine($"        return $this->{supclassattr.attribute_name};");
+                sourceCodeBuilder.AppendLine("      }");
+            }
+            sourceCodeBuilder.AppendLine("");
+            foreach (var supclassattr in model.attributes)
+            {
+                sourceCodeBuilder.AppendLine($"      public function set{supclassattr.attribute_name}(${supclassattr.attribute_name}) {{");
+                sourceCodeBuilder.AppendLine($"        $this->{supclassattr.attribute_name} = ${supclassattr.attribute_name};");
+                sourceCodeBuilder.AppendLine("      }");
+            }
+            sourceCodeBuilder.AppendLine("");
+            foreach (var supclassattr in model.attributes)
+            {
+                if (supclassattr.data_type == "state")
+                {
+                    sourceCodeBuilder.AppendLine("      abstract public function onStateAction();");
+                }
+            }
+            sourceCodeBuilder.AppendLine("}\n");
         }
 
         private void GenerateClass(JsonData.Model model, JsonData json)
         {
             stateAttribute = null;
-            sourceCodeBuilder.AppendLine($"class {model.class_name} {{");
+            var classPairs = new List<(string SuperclassName, string SubclassName)>();
+            foreach (JsonData.Model modell in json.model)
+            {
+                if (modell.subclasses != null)
+                {
+                    foreach (var subclass in modell.subclasses)
+                    {
+                        classPairs.Add((modell.superclass_name, subclass.class_name));
+                    }
+                }
+            }
+            var superclass = classPairs.FirstOrDefault(pair => pair.SubclassName == model.class_name).SuperclassName;
+
+            if (superclass != null)
+            {
+                sourceCodeBuilder.AppendLine($"class {model.class_name} extends {superclass} {{");
+            }
+            else
+            {
+                sourceCodeBuilder.AppendLine($"class {model.class_name} {{");
+            }
 
             // Sort attributes alphabetically
             var sortedAttributes = model.attributes.OrderBy(attr => attr.attribute_name);
@@ -243,14 +372,14 @@ namespace xtUML1
 
             foreach (var attribute in model.attributes)
             {
-                GenerateGetter(attribute);
+                GenerateGetter(attribute, json);
             }
 
             sourceCodeBuilder.AppendLine("");
 
             foreach (var attribute in model.attributes)
             {
-                GenerateSetter(attribute);
+                GenerateSetter(attribute, json);
             }
 
             if (model.states != null)
@@ -264,6 +393,25 @@ namespace xtUML1
 
         private void GenerateAttribute(JsonData.Attribute1 attribute, JsonData json)
         {
+            var superclassAttributes = new List<(string AttributeName, string DataType)>();
+
+            foreach (JsonData.Model model in json.model)
+            {
+                if (model.type == "superclass")
+                {
+                    foreach (var supclassattr in model.attributes)
+                    {
+                        superclassAttributes.Add((supclassattr.attribute_name, supclassattr.data_type));
+                    }
+                }
+            }
+
+            var isInSuperclass = superclassAttributes.Any(attr => attr.AttributeName == attribute.attribute_name && attr.DataType == attribute.data_type);
+            if (isInSuperclass)
+            {
+                return;
+            }
+
             // Adjust data types as needed
             string dataType = MapDataType(attribute.data_type);
             if (attribute.data_type != "state" && attribute.data_type != "inst_event" && attribute.data_type != "inst_ref" && attribute.data_type != "inst_ref_set" && attribute.data_type != "inst_ref_<timer>" && attribute.data_type != "inst_event")
@@ -300,7 +448,7 @@ namespace xtUML1
                 sourceCodeBuilder.AppendLine("      " +
                     $"public function {attribute.event_name}({cName} ${cName})" + " {");
                 sourceCodeBuilder.AppendLine("         " +
-                    $"${cName}->status = {cName}States::{attribute.state_name};");
+                    $"${cName}->status = {cName}States::{attribute.state_name.Replace(" ", "").ToUpper()};");
                 sourceCodeBuilder.AppendLine("      " +
                     "}");
                 sourceCodeBuilder.AppendLine("");
@@ -312,7 +460,7 @@ namespace xtUML1
 
         }
 
-        private void GenerateAssociationClass(JsonData.Model associationModel)
+        private void GenerateAssociationClass(JsonData.Model associationModel, JsonData json)
         {
             // Check if associationModel is not null
             if (associationModel == null)
@@ -321,14 +469,31 @@ namespace xtUML1
                 return;
             }
 
-            sourceCodeBuilder.AppendLine($"class assoc_{associationModel.class_name} {{");
+            var classPairs = new List<(string SuperclassName, string SubclassName)>();
+            foreach (JsonData.Model modell in json.model)
+            {
+                if (modell.subclasses != null)
+                {
+                    foreach (var subclass in modell.subclasses)
+                    {
+                        classPairs.Add((modell.superclass_name, subclass.class_name));
+                    }
+                }
+            }
+            var superclass = classPairs.FirstOrDefault(pair => pair.SubclassName == associationModel.class_name).SuperclassName;
+
+            if (superclass != null)
+            {
+                sourceCodeBuilder.AppendLine($"class assoc_{associationModel.class_name} extends {superclass} {{");
+            }
+            else
+            {
+                sourceCodeBuilder.AppendLine($"class assoc_{associationModel.class_name} {{");
+            }
 
             foreach (var attribute in associationModel.attributes)
             {
-                // Adjust data types as needed
-                string dataType = MapDataType(attribute.data_type);
-
-                sourceCodeBuilder.AppendLine($"     private {dataType} ${attribute.attribute_name};");
+                GenerateAttribute(attribute, json);
             }
 
             // Check if associatedClass.@class is not null before iterating
@@ -362,12 +527,12 @@ namespace xtUML1
 
             foreach (var attribute in associationModel.attributes)
             {
-                GenerateGetter(attribute);
+                GenerateGetter(attribute, json);
             }
 
             foreach (var attribute in associationModel.attributes)
             {
-                GenerateSetter(attribute);
+                GenerateSetter(attribute, json);
             }
             sourceCodeBuilder.AppendLine("}\n\n");
         }
@@ -397,14 +562,14 @@ namespace xtUML1
 
             foreach (var attribute in imported.attributes)
             {
-                GenerateGetter(attribute);
+                GenerateGetter(attribute, json);
             }
 
             sourceCodeBuilder.AppendLine("");
 
             foreach (var attribute in imported.attributes)
             {
-                GenerateSetter(attribute);
+                GenerateSetter(attribute, json);
             }
 
             if (imported.states != null)
@@ -491,8 +656,27 @@ namespace xtUML1
             sourceCodeBuilder.AppendLine("     }");
         }
 
-        private void GenerateGetter(JsonData.Attribute1 getter)
+        private void GenerateGetter(JsonData.Attribute1 getter, JsonData json)
         {
+            var superclassAttributes = new List<(string AttributeName, string DataType)>();
+
+            foreach (JsonData.Model model in json.model)
+            {
+                if (model.type == "superclass")
+                {
+                    foreach (var supclassattr in model.attributes)
+                    {
+                        superclassAttributes.Add((supclassattr.attribute_name, supclassattr.data_type));
+                    }
+                }
+            }
+
+            var isInSuperclass = superclassAttributes.Any(attr => attr.AttributeName == getter.attribute_name && attr.DataType == getter.data_type);
+            if (isInSuperclass)
+            {
+                return;
+            }
+
             if (getter.data_type != "state" && getter.data_type != "inst_ref_<timer>" && getter.data_type != "inst_ref" && getter.data_type != "inst_ref_set" && getter.data_type != "inst_event")
             {
                 sourceCodeBuilder.AppendLine($"      public function get{getter.attribute_name}() {{");
@@ -524,8 +708,27 @@ namespace xtUML1
 
         }
 
-        private void GenerateSetter(JsonData.Attribute1 setter)
+        private void GenerateSetter(JsonData.Attribute1 setter, JsonData json)
         {
+            var superclassAttributes = new List<(string AttributeName, string DataType)>();
+
+            foreach (JsonData.Model model in json.model)
+            {
+                if (model.type == "superclass")
+                {
+                    foreach (var supclassattr in model.attributes)
+                    {
+                        superclassAttributes.Add((supclassattr.attribute_name, supclassattr.data_type));
+                    }
+                }
+            }
+
+            var isInSuperclass = superclassAttributes.Any(attr => attr.AttributeName == setter.attribute_name && attr.DataType == setter.data_type);
+            if (isInSuperclass)
+            {
+                return;
+            }
+
             if (setter.data_type != "state" && setter.data_type != "inst_ref_<timer>" && setter.data_type != "inst_ref" && setter.data_type != "inst_ref_set" && setter.data_type != "inst_event")
             {
                 sourceCodeBuilder.AppendLine($"      public function set{setter.attribute_name}(${setter.attribute_name}) {{");

@@ -16,13 +16,22 @@ namespace xtUML1
         {
             public string type { get; set; }
             public string class_id { get; set; }
+            public string superclass_id { get; set; }
             public string class_name { get; set; }
+            public string superclass_name { get; set; }
             public string KL { get; set; }
             public string name { get; set; }
             public List<Attribute1> attributes { get; set; }
+            public List<Subclasses> subclasses { get; set; }
             public List<State> states { get; set; }
             public Model model { get; set; }
             public List<Class1> @class { get; set; }
+        }
+
+        public class Subclasses
+        {
+            public string class_id { get; set; }
+            public string class_name { get; set; }
         }
 
         public class Attribute1
