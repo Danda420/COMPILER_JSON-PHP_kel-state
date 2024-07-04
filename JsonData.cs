@@ -74,7 +74,10 @@ namespace xtUML1
         public class ClassModel
         {
             public string ClassId { get; set; }
+            public string SuperClassId { get; set; }
+            public List<ClassModel> SubClasses { get; set; }
             public string ClassName { get; set; }
+            public string SuperClassName { get; set; }
             public string KL { get; set; }
             public List<AttributeModel> Attributes { get; set; }
         }
