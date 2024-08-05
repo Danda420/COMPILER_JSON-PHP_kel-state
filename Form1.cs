@@ -508,7 +508,7 @@ namespace xtUML1
 
                 foreach (var state in states)
                 {
-                    string stateName = state["state_name"]?.ToString();
+                    string stateName = state["state_model_name"]?.ToString();
                     string stateModelName = $"{objectName}.{stateName}";
 
                     // Check uniqueness of state model
@@ -598,7 +598,7 @@ namespace xtUML1
 
                                     foreach (var stateItem in statesArray)
                                     {
-                                        string stateName = stateItem["state_name"]?.ToString();
+                                        string stateName = stateItem["state_model_name"]?.ToString();
                                         string stateModelName = $"{modelName}.{stateName}";
 
                                         JToken eventsToken = stateItem["events"];

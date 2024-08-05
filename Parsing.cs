@@ -366,66 +366,63 @@ namespace xtUML1
                     HashSet<string> classNames = new HashSet<string>();
                     HashSet<string> classIds = new HashSet<string>();
 
-                    foreach (var item in subsystem["model"])
+                    if (subsystem != null && subsystem["model"] is JArray models)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        if ((itemType == "class" || itemType == "association_class") && item["class_name"] != null)
+                        foreach (var item in models)
                         {
-                            var className = item["class_name"]?.ToString();
-                            var classId = item["class_id"]?.ToString();
+                            var itemType = item["type"]?.ToString();
 
-                            if (string.IsNullOrWhiteSpace(className) || string.IsNullOrWhiteSpace(classId))
+                            if ((itemType == "class" || itemType == "association_class") && item["class_name"] != null)
                             {
-                                textBox4.AppendText("Syntax error 4: Class name or class_id is empty in the subsystem. \r\n");
+                                var className = item["class_name"]?.ToString();
+                                var classId = item["class_id"]?.ToString();
 
-                            }
-
-                            if (classNames.Contains(className))
-                            {
-                                textBox4.AppendText($"Syntax error 4: Duplicate class name {className} within this subsystem. \r\n");
-
-                            }
-
-                            if (classIds.Contains(classId))
-                            {
-                                textBox4.AppendText($"Syntax error 4: Duplicate class_id {classId} within this subsystem. \r\n");
-
-                            }
-
-                            classNames.Add(className);
-                            classIds.Add(classId);
-                        }
-
-                        if (itemType == "association" && item["model"] is JObject associationModel)
-                        {
-                            var associationItemType = associationModel["type"]?.ToString();
-
-                            if (associationItemType == "association_class" && associationModel["class_name"] != null)
-                            {
-                                var associationClassName = associationModel["class_name"]?.ToString();
-                                var associationClassId = associationModel["class_id"]?.ToString();
-
-                                if (string.IsNullOrWhiteSpace(associationClassName) || string.IsNullOrWhiteSpace(associationClassId))
+                                if (string.IsNullOrWhiteSpace(className) || string.IsNullOrWhiteSpace(classId))
                                 {
                                     textBox4.AppendText("Syntax error 4: Class name or class_id is empty in the subsystem. \r\n");
-
                                 }
 
-                                if (classNames.Contains(associationClassName))
+                                if (classNames.Contains(className))
                                 {
-                                    textBox4.AppendText($"Syntax error 4: Duplicate class name {associationClassName} within this subsystem. \r\n");
-
+                                    textBox4.AppendText($"Syntax error 4: Duplicate class name {className} within this subsystem. \r\n");
                                 }
 
-                                if (classIds.Contains(associationClassId))
+                                if (classIds.Contains(classId))
                                 {
-                                    textBox4.AppendText($"Syntax error 4: Duplicate class_id {associationClassId} within this subsystem. \r\n");
-
+                                    textBox4.AppendText($"Syntax error 4: Duplicate class_id {classId} within this subsystem. \r\n");
                                 }
 
-                                classNames.Add(associationClassName);
-                                classIds.Add(associationClassId);
+                                classNames.Add(className);
+                                classIds.Add(classId);
+                            }
+
+                            if (itemType == "association" && item["model"] is JObject associationModel)
+                            {
+                                var associationItemType = associationModel["type"]?.ToString();
+
+                                if (associationItemType == "association_class" && associationModel["class_name"] != null)
+                                {
+                                    var associationClassName = associationModel["class_name"]?.ToString();
+                                    var associationClassId = associationModel["class_id"]?.ToString();
+
+                                    if (string.IsNullOrWhiteSpace(associationClassName) || string.IsNullOrWhiteSpace(associationClassId))
+                                    {
+                                        textBox4.AppendText("Syntax error 4: Class name or class_id is empty in the subsystem. \r\n");
+                                    }
+
+                                    if (classNames.Contains(associationClassName))
+                                    {
+                                        textBox4.AppendText($"Syntax error 4: Duplicate class name {associationClassName} within this subsystem. \r\n");
+                                    }
+
+                                    if (classIds.Contains(associationClassId))
+                                    {
+                                        textBox4.AppendText($"Syntax error 4: Duplicate class_id {associationClassId} within this subsystem. \r\n");
+                                    }
+
+                                    classNames.Add(associationClassName);
+                                    classIds.Add(associationClassId);
+                                }
                             }
                         }
                     }
@@ -512,51 +509,55 @@ namespace xtUML1
                 foreach (var subsystem in jsonArray)
                 {
                     HashSet<string> uniqueKLs = new HashSet<string>();
-                    foreach (var item in subsystem["model"])
+                    if (subsystem != null && subsystem["model"] is JArray models)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        if (itemType == "class" && item["class_name"] != null)
+                        foreach (var item in subsystem["model"])
                         {
-                            var className = item["class_name"]?.ToString();
-                            var KL = item["KL"]?.ToString();
+                            var itemType = item["type"]?.ToString();
 
-                            if (string.IsNullOrWhiteSpace(className) || string.IsNullOrWhiteSpace(KL))
+                            if (itemType == "class" && item["class_name"] != null)
                             {
-                                textBox4.AppendText("Syntax error 5: Class name or KL is empty in the subsystem. \r\n");
-                            }
+                                var className = item["class_name"]?.ToString();
+                                var KL = item["KL"]?.ToString();
 
-                            if (uniqueKLs.Contains(KL))
-                            {
-                                textBox4.AppendText($"Syntax error 5: Duplicate KL value {KL} within this subsystem. \r\n");
-                            }
-
-                            uniqueKLs.Add(KL);
-                        }
-
-                        if (itemType == "association" && item["model"] is JObject associationModel)
-                        {
-                            var associationItemType = associationModel["type"]?.ToString();
-
-                            if (associationItemType == "association_class" && associationModel["class_name"] != null)
-                            {
-                                var associationKL = associationModel["KL"]?.ToString();
-
-                                if (string.IsNullOrWhiteSpace(associationKL))
+                                if (string.IsNullOrWhiteSpace(className) || string.IsNullOrWhiteSpace(KL))
                                 {
-                                    textBox4.AppendText("Syntax error 5: KL value is empty in the subsystem. \r\n");
+                                    textBox4.AppendText("Syntax error 5: Class name or KL is empty in the subsystem. \r\n");
                                 }
 
-                                if (uniqueKLs.Contains(associationKL))
+                                if (uniqueKLs.Contains(KL))
                                 {
-                                    textBox4.AppendText($"Syntax error 5: Duplicate KL value {associationKL} within this subsystem. \r\n");
-
+                                    textBox4.AppendText($"Syntax error 5: Duplicate KL value {KL} within this subsystem. \r\n");
                                 }
 
-                                uniqueKLs.Add(associationKL);
+                                uniqueKLs.Add(KL);
+                            }
+
+                            if (itemType == "association" && item["model"] is JObject associationModel)
+                            {
+                                var associationItemType = associationModel["type"]?.ToString();
+
+                                if (associationItemType == "association_class" && associationModel["class_name"] != null)
+                                {
+                                    var associationKL = associationModel["KL"]?.ToString();
+
+                                    if (string.IsNullOrWhiteSpace(associationKL))
+                                    {
+                                        textBox4.AppendText("Syntax error 5: KL value is empty in the subsystem. \r\n");
+                                    }
+
+                                    if (uniqueKLs.Contains(associationKL))
+                                    {
+                                        textBox4.AppendText($"Syntax error 5: Duplicate KL value {associationKL} within this subsystem. \r\n");
+
+                                    }
+
+                                    uniqueKLs.Add(associationKL);
+                                }
                             }
                         }
                     }
+                    
                 }
 
                 return true;
@@ -575,76 +576,75 @@ namespace xtUML1
             {
                 foreach (var subsystem in jsonArray)
                 {
-
-                    foreach (var item in subsystem["model"])
+                    if (subsystem != null && subsystem["model"] is JArray models)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        if (itemType == "class" && item["class_name"] != null)
+                        foreach (var item in models)
                         {
-                            var className = item["class_name"]?.ToString();
-                            var attributes = item["attributes"] as JArray;
+                            var itemType = item["type"]?.ToString();
 
-                            if (attributes != null)
+                            if (itemType == "class" && item["class_name"] != null)
                             {
-                                HashSet<string> uniqueAttributeNames = new HashSet<string>();
+                                var className = item["class_name"]?.ToString();
+                                var attributes = item["attributes"] as JArray;
 
-                                foreach (var attribute in attributes)
+                                if (attributes != null)
                                 {
-                                    var attributeName = attribute["attribute_name"]?.ToString();
+                                    HashSet<string> uniqueAttributeNames = new HashSet<string>();
 
-                                    if (string.IsNullOrWhiteSpace(attributeName))
-                                    {
-                                        textBox4.AppendText($"Syntax error 6: Attribute name is empty in class {className}. \r\n");
-
-                                    }
-
-                                    if (uniqueAttributeNames.Contains(attributeName))
-                                    {
-                                        textBox4.AppendText($"Syntax error 6: Duplicate attribute name {attributeName} in class {className}. \r\n");
-
-                                    }
-
-                                    uniqueAttributeNames.Add(attributeName);
-                                }
-                            }
-                        }
-
-                        if (itemType == "association" && item["model"] is JObject associationModel)
-                        {
-                            var associationItemType = associationModel["type"]?.ToString();
-
-                            if (associationItemType == "association_class" && associationModel["class_name"] != null)
-                            {
-                                var associationClassName = associationModel["class_name"]?.ToString();
-                                var associationAttributes = associationModel["attributes"] as JArray;
-
-                                if (associationAttributes != null)
-                                {
-                                    HashSet<string> uniqueAssociationAttributeNames = new HashSet<string>();
-
-                                    foreach (var attribute in associationAttributes)
+                                    foreach (var attribute in attributes)
                                     {
                                         var attributeName = attribute["attribute_name"]?.ToString();
 
                                         if (string.IsNullOrWhiteSpace(attributeName))
                                         {
-                                            textBox4.AppendText($"Syntax error 6: Attribute name is empty in association class {associationClassName}. \r\n");
-
+                                            textBox4.AppendText($"Syntax error 6: Attribute name is empty in class {className}. \r\n");
                                         }
-
-                                        if (uniqueAssociationAttributeNames.Contains(attributeName))
+                                        else
                                         {
-                                            textBox4.AppendText($"Syntax error 6: Duplicate attribute name {attributeName} in association class {associationClassName}. \r\n");
-
+                                            if (uniqueAttributeNames.Contains(attributeName))
+                                            {
+                                                textBox4.AppendText($"Syntax error 6: Duplicate attribute name {attributeName} in class {className}. \r\n");
+                                            }
+                                            uniqueAttributeNames.Add(attributeName);
                                         }
+                                    }
+                                }
+                            }
 
-                                        uniqueAssociationAttributeNames.Add(attributeName);
+                            if (itemType == "association" && item["model"] is JObject associationModel)
+                            {
+                                var associationItemType = associationModel["type"]?.ToString();
+
+                                if (associationItemType == "association_class" && associationModel["class_name"] != null)
+                                {
+                                    var associationClassName = associationModel["class_name"]?.ToString();
+                                    var associationAttributes = associationModel["attributes"] as JArray;
+
+                                    if (associationAttributes != null)
+                                    {
+                                        HashSet<string> uniqueAssociationAttributeNames = new HashSet<string>();
+
+                                        foreach (var attribute in associationAttributes)
+                                        {
+                                            var attributeName = attribute["attribute_name"]?.ToString();
+
+                                            if (string.IsNullOrWhiteSpace(attributeName))
+                                            {
+                                                textBox4.AppendText($"Syntax error 6: Attribute name is empty in association class {associationClassName}. \r\n");
+                                            }
+                                            else
+                                            {
+                                                if (uniqueAssociationAttributeNames.Contains(attributeName))
+                                                {
+                                                    textBox4.AppendText($"Syntax error 6: Duplicate attribute name {attributeName} in association class {associationClassName}. \r\n");
+                                                }
+                                                uniqueAssociationAttributeNames.Add(attributeName);
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
-
                     }
                 }
                 return true;
@@ -663,57 +663,22 @@ namespace xtUML1
             {
                 foreach (var subsystem in jsonArray)
                 {
-                    foreach (var item in subsystem["model"])
+                    if (subsystem != null && subsystem["model"] is JArray models)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        if (itemType == "class" && item["class_name"] != null)
+                        foreach (var item in models)
                         {
-                            var className = item["class_name"]?.ToString();
-                            var attributes = item["attributes"] as JArray;
+                            var itemType = item["type"]?.ToString();
 
-                            if (attributes != null)
+                            if (itemType == "class" && item["class_name"] != null)
                             {
-                                bool hasPrimaryKey = false;
+                                var className = item["class_name"]?.ToString();
+                                var attributes = item["attributes"] as JArray;
 
-                                foreach (var attribute in attributes)
-                                {
-                                    var attributeType = attribute["attribute_type"]?.ToString();
-
-                                    if (attributeType == "naming_attribute")
-                                    {
-                                        hasPrimaryKey = true;
-                                        break;
-                                    }
-                                }
-
-                                if (!hasPrimaryKey)
-                                {
-                                    textBox4.AppendText($"Syntax error 7: Class {className} does not have a primary key. \r\n");
-
-                                }
-                            }
-                            else
-                            {
-                                textBox4.AppendText($"Syntax error 7: Class {className} does not have any attributes. \r\n");
-
-                            }
-                        }
-
-                        if (itemType == "association" && item["model"] is JObject associationModel)
-                        {
-                            var associationItemType = associationModel["type"]?.ToString();
-
-                            if (associationItemType == "association_class" && associationModel["class_name"] != null)
-                            {
-                                var associationClassName = associationModel["class_name"]?.ToString();
-                                var associationAttributes = associationModel["attributes"] as JArray;
-
-                                if (associationAttributes != null)
+                                if (attributes != null)
                                 {
                                     bool hasPrimaryKey = false;
 
-                                    foreach (var attribute in associationAttributes)
+                                    foreach (var attribute in attributes)
                                     {
                                         var attributeType = attribute["attribute_type"]?.ToString();
 
@@ -726,18 +691,51 @@ namespace xtUML1
 
                                     if (!hasPrimaryKey)
                                     {
-                                        textBox4.AppendText($"Syntax error 7: Association Class {associationClassName} does not have a primary key. \r\n");
-
+                                        textBox4.AppendText($"Syntax error 7: Class {className} does not have a primary key. \r\n");
                                     }
                                 }
                                 else
                                 {
-                                    textBox4.AppendText($"Syntax error 7: Association Class {associationClassName} does not have any attributes. \r\n");
+                                    textBox4.AppendText($"Syntax error 7: Class {className} does not have any attributes. \r\n");
+                                }
+                            }
 
+                            if (itemType == "association" && item["model"] is JObject associationModel)
+                            {
+                                var associationItemType = associationModel["type"]?.ToString();
+
+                                if (associationItemType == "association_class" && associationModel["class_name"] != null)
+                                {
+                                    var associationClassName = associationModel["class_name"]?.ToString();
+                                    var associationAttributes = associationModel["attributes"] as JArray;
+
+                                    if (associationAttributes != null)
+                                    {
+                                        bool hasPrimaryKey = false;
+
+                                        foreach (var attribute in associationAttributes)
+                                        {
+                                            var attributeType = attribute["attribute_type"]?.ToString();
+
+                                            if (attributeType == "naming_attribute")
+                                            {
+                                                hasPrimaryKey = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!hasPrimaryKey)
+                                        {
+                                            textBox4.AppendText($"Syntax error 7: Association Class {associationClassName} does not have a primary key. \r\n");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        textBox4.AppendText($"Syntax error 7: Association Class {associationClassName} does not have any attributes. \r\n");
+                                    }
                                 }
                             }
                         }
-
                     }
                 }
 
@@ -760,27 +758,30 @@ namespace xtUML1
                 {
                     HashSet<string> associationNames = new HashSet<string>();
 
-                    foreach (var item in subsystem["model"])
+                    if (subsystem != null && subsystem["model"] is JArray models)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        if (itemType == "association" && item["name"] != null)
+                        foreach (var item in models)
                         {
-                            var associationName = item["name"]?.ToString();
+                            var itemType = item["type"]?.ToString();
 
-                            if (string.IsNullOrWhiteSpace(associationName))
+                            if (itemType == "association" && item["name"] != null)
                             {
-                                textBox4.AppendText("Syntax error 8: Association name is empty in the subsystem. \r\n");
+                                var associationName = item["name"]?.ToString();
 
+                                if (string.IsNullOrWhiteSpace(associationName))
+                                {
+                                    textBox4.AppendText("Syntax error 8: Association name is empty in the subsystem. \r\n");
+                                }
+                                else
+                                {
+                                    if (associationNames.Contains(associationName))
+                                    {
+                                        textBox4.AppendText($"Syntax error 8: Duplicate association name {associationName} within this subsystem. \r\n");
+                                    }
+
+                                    associationNames.Add(associationName);
+                                }
                             }
-
-                            if (associationNames.Contains(associationName))
-                            {
-                                textBox4.AppendText($"Syntax error 8: Duplicate association name {associationName} within this subsystem.\r\n");
-
-                            }
-
-                            associationNames.Add(associationName);
                         }
                     }
                 }
@@ -801,41 +802,56 @@ namespace xtUML1
             {
                 foreach (var subsystem in jsonArray)
                 {
-                    foreach (var item in subsystem["model"])
+                    if (subsystem != null && subsystem["model"] is JArray models)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        if (itemType == "association")
+                        foreach (var item in models)
                         {
-                            var class1Multiplicity = item["class"][0]["class_multiplicity"]?.ToString();
-                            var class2Multiplicity = item["class"][1]["class_multiplicity"]?.ToString();
+                            var itemType = item["type"]?.ToString();
 
-                            if ((class1Multiplicity == "0..*" && class2Multiplicity == "0..*") || (class1Multiplicity == "0..*" && class2Multiplicity == "1..*") || (class1Multiplicity == "1..*" && class2Multiplicity == "0..*") || (class1Multiplicity == "1..*" && class2Multiplicity == "1..*"))
+                            if (itemType == "association")
                             {
-                                var associationModel = item["model"];
-                                if (associationModel == null)
-                                {
-                                    textBox4.AppendText($"Syntax error 9: Relationship {item["name"]?.ToString()} (many-to-many) has not been formalized with an association_class. \r\n");
-                                }
+                                var class1 = item["class"]?[0];
+                                var class2 = item["class"]?[1];
 
-                                if (associationModel != null && associationModel["type"]?.ToString() != "association_class")
-                                {
-                                    textBox4.AppendText($"Syntax error 9: Relationship {item["name"]?.ToString()} (many-to-many) has not been formalized with an association_class. \r\n");
-                                }
-                            }
-                            else if ((class1Multiplicity == "0..*" && class2Multiplicity == "1..1") ||
-                                     (class1Multiplicity == "1..1" && class2Multiplicity == "0..*") ||
-                                     (class1Multiplicity == "1..*" && class2Multiplicity == "1..1") ||
-                                     (class1Multiplicity == "1..1" && class2Multiplicity == "1..*") ||
-                                     (class1Multiplicity == "1..1" && class2Multiplicity == "1..1"))
-                            {
-                                var class1Id = item["class"][0]["class_id"]?.ToString();
-                                var class2Id = item["class"][1]["class_id"]?.ToString();
+                                var class1Multiplicity = class1?["class_multiplicity"]?.ToString();
+                                var class2Multiplicity = class2?["class_multiplicity"]?.ToString();
 
-                                if (!HasReferentialAttribute(jsonArray, class1Id) && !HasReferentialAttribute(jsonArray, class2Id))
+                                if (class1Multiplicity != null && class2Multiplicity != null)
                                 {
-                                    textBox4.AppendText($"Syntax error 9: One of the Class {class1Id} or {class2Id} in relationship {item["name"]?.ToString()} (one-to-one) must be formalized with a referential_attribute. \r\n");
+                                    if ((class1Multiplicity == "0..*" && class2Multiplicity == "0..*") ||
+                                        (class1Multiplicity == "0..*" && class2Multiplicity == "1..*") ||
+                                        (class1Multiplicity == "1..*" && class2Multiplicity == "0..*") ||
+                                        (class1Multiplicity == "1..*" && class2Multiplicity == "1..*"))
+                                    {
+                                        var associationModel = item["model"];
+                                        var associationName = item["name"]?.ToString();
 
+                                        if (associationModel == null)
+                                        {
+                                            textBox4.AppendText($"Syntax error 9: Relationship {associationName} (many-to-many) has not been formalized with an association_class. \r\n");
+                                        }
+                                        else if (associationModel["type"]?.ToString() != "association_class")
+                                        {
+                                            textBox4.AppendText($"Syntax error 9: Relationship {associationName} (many-to-many) has not been formalized with an association_class. \r\n");
+                                        }
+                                    }
+                                    else if ((class1Multiplicity == "0..*" && class2Multiplicity == "1..1") ||
+                                             (class1Multiplicity == "1..1" && class2Multiplicity == "0..*") ||
+                                             (class1Multiplicity == "1..*" && class2Multiplicity == "1..1") ||
+                                             (class1Multiplicity == "1..1" && class2Multiplicity == "1..*") ||
+                                             (class1Multiplicity == "1..1" && class2Multiplicity == "1..1"))
+                                    {
+                                        var class1Id = class1?["class_id"]?.ToString();
+                                        var class2Id = class2?["class_id"]?.ToString();
+
+                                        if (class1Id != null && class2Id != null)
+                                        {
+                                            if (!HasReferentialAttribute(jsonArray, class1Id) && !HasReferentialAttribute(jsonArray, class2Id))
+                                            {
+                                                textBox4.AppendText($"Syntax error 9: One of the Class {class1Id} or {class2Id} in relationship {item["name"]?.ToString()} (one-to-one) must be formalized with a referential_attribute. \r\n");
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1049,30 +1065,46 @@ namespace xtUML1
                 {
                     var subsystemId = subsystem["sub_id"]?.ToString();
 
-                    foreach (var item in subsystem["model"])
+                    if (subsystem != null && subsystem["model"] is JArray models)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        if (itemType == "association")
+                        foreach (var item in models)
                         {
-                            var class1Id = item["class"][0]["class_id"]?.ToString();
-                            var class2Id = item["class"][1]["class_id"]?.ToString();
+                            var itemType = item["type"]?.ToString();
 
-                            if (!IsClassInSubsystem(subsystem, class1Id))
+                            if (itemType == "association")
                             {
-                                if (!TryFindImportedClassInOtherSubsystem(subsystem, class1Id))
-                                {
-                                    textBox4.AppendText($"Syntax error 11: Subsystem {subsystemId} does not have a corresponding class or imported class for relationship {item["name"]?.ToString()}. \r\n");
+                                var classes = item["class"] as JArray;
 
+                                if (classes != null && classes.Count >= 2)
+                                {
+                                    var class1Id = classes[0]?["class_id"]?.ToString();
+                                    var class2Id = classes[1]?["class_id"]?.ToString();
+
+                                    if (class1Id != null)
+                                    {
+                                        if (!IsClassInSubsystem(subsystem, class1Id))
+                                        {
+                                            if (!TryFindImportedClassInOtherSubsystem(subsystem, class1Id))
+                                            {
+                                                textBox4.AppendText($"Syntax error 11: Subsystem {subsystemId} does not have a corresponding class or imported class for relationship {item["name"]?.ToString()}. \r\n");
+                                            }
+                                        }
+                                    }
+
+                                    if (class2Id != null)
+                                    {
+                                        if (!IsClassInSubsystem(subsystem, class2Id))
+                                        {
+                                            if (!TryFindImportedClassInOtherSubsystem(subsystem, class2Id))
+                                            {
+                                                textBox4.AppendText($"Syntax error 11: Subsystem {subsystemId} does not have a class or imported class corresponding to the relationship {item["name"]?.ToString()}. \r\n");
+                                            }
+                                        }
+                                    }
                                 }
-                            }
-
-                            if (!IsClassInSubsystem(subsystem, class2Id))
-                            {
-                                if (!TryFindImportedClassInOtherSubsystem(subsystem, class2Id))
+                                else
                                 {
-                                    textBox4.AppendText($"Syntax error 11: Subsystem {subsystemId} does not have a class or imported class corresponding to the relationship {item["name"]?.ToString()}. \r\n");
-
+                                    textBox4.AppendText($"Syntax error 11: Association {item["name"]?.ToString()} does not have valid class references. \r\n");
                                 }
                             }
                         }
@@ -1258,45 +1290,52 @@ namespace xtUML1
                 {
                     var currentSubId = currentSubsystem["sub_id"]?.ToString();
 
-                    foreach (var item in currentSubsystem["model"])
+                    if (currentSubsystem != null && currentSubsystem["model"] is JArray models)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        if (itemType == "association")
+                        foreach (var item in models)
                         {
-                            var class1Id = item["class"][0]["class_id"]?.ToString();
-                            var class2Id = item["class"][1]["class_id"]?.ToString();
+                            var itemType = item["type"]?.ToString();
 
-                            if (!IsClassInSubsystem(currentSubsystem, class1Id))
+                            if (itemType == "association")
                             {
-                                if (!TryFindImportedClassInOtherSubsystem(currentSubsystem, class1Id))
-                                {
-                                    textBox4.AppendText($"Syntax error 14: Subsystem {currentSubsystem["sub_name"]} does not have a corresponding class or imported class for the relationship {item["name"]?.ToString()}.\r\n");
+                                var classes = item["class"] as JArray;
 
+                                if (classes != null && classes.Count >= 2)
+                                {
+                                    var class1Id = classes[0]?["class_id"]?.ToString();
+                                    var class2Id = classes[1]?["class_id"]?.ToString();
+
+                                    if (class1Id != null && !IsClassInSubsystem(currentSubsystem, class1Id))
+                                    {
+                                        if (!TryFindImportedClassInOtherSubsystem(currentSubsystem, class1Id))
+                                        {
+                                            textBox4.AppendText($"Syntax error 14: Subsystem {currentSubsystem["sub_name"]} does not have a corresponding class or imported class for the relationship {item["name"]?.ToString()}.\r\n");
+                                        }
+
+                                        if (!IsRelationshipInOtherSubsystem(subsystems, currentSubsystem, class1Id, class2Id))
+                                        {
+                                            textBox4.AppendText($"Syntax error 14: Subsystem {currentSubId} has a relationship with class_id {class1Id} or {class2Id}, but there is no corresponding relationship in other subsystems. \r\n");
+                                        }
+                                    }
+
+                                    if (class2Id != null && !IsClassInSubsystem(currentSubsystem, class2Id))
+                                    {
+                                        if (!TryFindImportedClassInOtherSubsystem(currentSubsystem, class2Id))
+                                        {
+                                            textBox4.AppendText($"Syntax error 14: Subsystem {currentSubsystem["sub_name"]} does not have a corresponding class or imported class for the relationship {item["name"]?.ToString()}. \r\n");
+                                        }
+
+                                        if (!IsRelationshipInOtherSubsystem(subsystems, currentSubsystem, class1Id, class2Id))
+                                        {
+                                            textBox4.AppendText($"Syntax error 14: Subsystem {currentSubId} has a relationship with class_id {class1Id} or {class2Id}, but there is no corresponding relationship in other subsystems. \r\n");
+                                        }
+                                    }
                                 }
-
-                                if (!IsRelationshipInOtherSubsystem(subsystems, currentSubsystem, class1Id, class2Id))
+                                else
                                 {
-                                    textBox4.AppendText($"Syntax error 14: Subsystem {currentSubId} has a relationship with class_id {class1Id} or {class2Id}, but there is no corresponding relationship in other subsystems. \r\n");
-
+                                    textBox4.AppendText($"Syntax error 14: Association {item["name"]?.ToString()} does not have valid class references. \r\n");
                                 }
                             }
-
-                            if (!IsClassInSubsystem(currentSubsystem, class2Id))
-                            {
-                                if (!TryFindImportedClassInOtherSubsystem(currentSubsystem, class2Id))
-                                {
-                                    textBox4.AppendText($"Syntax error 14: Subsystem {currentSubsystem["sub_name"]} does not have a corresponding class or imported class for the relationship {item["name"]?.ToString()}. \r\n");
-
-                                }
-
-                                if (!IsRelationshipInOtherSubsystem(subsystems, currentSubsystem, class1Id, class2Id))
-                                {
-                                    textBox4.AppendText($"Syntax error 14: Subsystem {currentSubId} has a relationship with class_id {class1Id} or {class2Id}, but there is no corresponding relationship in other subsystems. \r\n");
-
-                                }
-                            }
-
                         }
                     }
                 }
@@ -1353,91 +1392,94 @@ namespace xtUML1
                     HashSet<string> classNames = new HashSet<string>();
                     HashSet<string> classIds = new HashSet<string>();
 
-                    foreach (var item in subsystem["model"])
+                    if (subsystem != null && subsystem["model"] is JArray models)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        if ((itemType == "class" || itemType == "association_class") && item["class_name"] != null)
+                        foreach (var item in models)
                         {
-                            var className = item["class_name"]?.ToString();
-                            var classId = item["class_id"]?.ToString();
-                            var classKeyLetter = item["KL"]?.ToString();
+                            var itemType = item["type"]?.ToString();
 
-                            if (string.IsNullOrWhiteSpace(className) || string.IsNullOrWhiteSpace(classId))
+                            if ((itemType == "class" || itemType == "association_class") && item["class_name"] != null)
                             {
-                                textBox4.AppendText("Syntax error 15: Class name or class_id is empty in the subsystem. \r\n");
-                                continue;
-                            }
+                                var className = item["class_name"]?.ToString();
+                                var classId = item["class_id"]?.ToString();
+                                var classKeyLetter = item["KL"]?.ToString();
 
-                            if (classNames.Contains(className))
-                            {
-                                textBox4.AppendText($"Syntax error15: Duplicate class name {className} within this subsystem. \r\n");
-                            }
-
-                            if (classIds.Contains(classId))
-                            {
-                                textBox4.AppendText($"Syntax error 15: Duplicate class_id {classId} within this subsystem. \r\n");
-                            }
-
-                            classNames.Add(className);
-                            classIds.Add(classId);
-
-                            // Check state models
-                            if (item["states"] != null)
-                            {
-                                foreach (var state in item["states"])
-                                {
-                                    var stateName = state["state_name"]?.ToString();
-                                    var stateKeyLetter = state["KL"]?.ToString();
-
-                                    if (stateName != className || stateKeyLetter != classKeyLetter)
-                                    {
-                                        textBox4.AppendText($"Syntax error 15: State model name or KeyLetter does not match the class name or KeyLetter for {className}. \r\n");
-                                    }
-                                }
-                            }
-                        }
-
-                        if (itemType == "association" && item["model"] is JObject associationModel)
-                        {
-                            var associationItemType = associationModel["type"]?.ToString();
-
-                            if (associationItemType == "association_class" && associationModel["class_name"] != null)
-                            {
-                                var associationClassName = associationModel["class_name"]?.ToString();
-                                var associationClassId = associationModel["class_id"]?.ToString();
-                                var associationClassKeyLetter = associationModel["KL"]?.ToString();
-
-                                if (string.IsNullOrWhiteSpace(associationClassName) || string.IsNullOrWhiteSpace(associationClassId))
+                                if (string.IsNullOrWhiteSpace(className) || string.IsNullOrWhiteSpace(classId))
                                 {
                                     textBox4.AppendText("Syntax error 15: Class name or class_id is empty in the subsystem. \r\n");
                                     continue;
                                 }
 
-                                if (classNames.Contains(associationClassName))
+                                if (classNames.Contains(className))
                                 {
-                                    textBox4.AppendText($"Syntax error 15: Duplicate class name {associationClassName} within this subsystem. \r\n");
+                                    textBox4.AppendText($"Syntax error 15: Duplicate class name {className} within this subsystem. \r\n");
                                 }
 
-                                if (classIds.Contains(associationClassId))
+                                if (classIds.Contains(classId))
                                 {
-                                    textBox4.AppendText($"Syntax error 15: Duplicate class_id {associationClassId} within this subsystem. \r\n");
+                                    textBox4.AppendText($"Syntax error 15: Duplicate class_id {classId} within this subsystem. \r\n");
                                 }
 
-                                classNames.Add(associationClassName);
-                                classIds.Add(associationClassId);
+                                classNames.Add(className);
+                                classIds.Add(classId);
 
-                                // Check state models for association classes
-                                if (associationModel["states"] != null)
+                                // Check state models
+                                if (item["states"] is JArray states)
                                 {
-                                    foreach (var state in associationModel["states"])
+                                    foreach (var state in states)
                                     {
-                                        var stateName = state["state_name"]?.ToString();
+                                        var stateName = state["state_model_name"]?.ToString();
                                         var stateKeyLetter = state["KL"]?.ToString();
 
-                                        if (stateName != associationClassName || stateKeyLetter != associationClassKeyLetter)
+                                        if (stateName != className || stateKeyLetter != classKeyLetter)
                                         {
-                                            textBox4.AppendText($"Syntax error 15: State model name or KeyLetter does not match the class name or KeyLetter for {associationClassName}. \r\n");
+                                            textBox4.AppendText($"Syntax error 15: State model name or KeyLetter does not match the class name or KeyLetter for {className}. \r\n");
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (itemType == "association" && item["model"] is JObject associationModel)
+                            {
+                                var associationItemType = associationModel["type"]?.ToString();
+
+                                if (associationItemType == "association_class" && associationModel["class_name"] != null)
+                                {
+                                    var associationClassName = associationModel["class_name"]?.ToString();
+                                    var associationClassId = associationModel["class_id"]?.ToString();
+                                    var associationClassKeyLetter = associationModel["KL"]?.ToString();
+
+                                    if (string.IsNullOrWhiteSpace(associationClassName) || string.IsNullOrWhiteSpace(associationClassId))
+                                    {
+                                        textBox4.AppendText("Syntax error 15: Class name or class_id is empty in the subsystem. \r\n");
+                                        continue;
+                                    }
+
+                                    if (classNames.Contains(associationClassName))
+                                    {
+                                        textBox4.AppendText($"Syntax error 15: Duplicate class name {associationClassName} within this subsystem. \r\n");
+                                    }
+
+                                    if (classIds.Contains(associationClassId))
+                                    {
+                                        textBox4.AppendText($"Syntax error 15: Duplicate class_id {associationClassId} within this subsystem. \r\n");
+                                    }
+
+                                    classNames.Add(associationClassName);
+                                    classIds.Add(associationClassId);
+
+                                    // Check state models for association classes
+                                    if (associationModel["states"] is JArray associationStates)
+                                    {
+                                        foreach (var state in associationStates)
+                                        {
+                                            var stateName = state["state_model_name"]?.ToString();
+                                            var stateKeyLetter = state["KL"]?.ToString();
+
+                                            if (stateName != associationClassName || stateKeyLetter != associationClassKeyLetter)
+                                            {
+                                                textBox4.AppendText($"Syntax error 15: State model name or KeyLetter does not match the class name or KeyLetter for {associationClassName}. \r\n");
+                                            }
                                         }
                                     }
                                 }
@@ -1466,39 +1508,55 @@ namespace xtUML1
 
                 foreach (var subsystem in jsonArray)
                 {
-                    foreach (var item in subsystem["model"])
+                    if (subsystem != null && subsystem["model"] is JArray modelItems)
                     {
-                        var itemType = item["type"]?.ToString();
-                        var className = item["class_name"]?.ToString();
-                        var keyLetter = item["KL"]?.ToString();
-
-                        if (itemType == "class" && className == "TIMER" && keyLetter == "TIM")
+                        foreach (var item in modelItems)
                         {
-                            timerObjectFound = true;
-                            var attributes = item["attributes"] as JArray;
-                            var requiredAttributes = new HashSet<string> { "timer_id", "instance_id", "event_label", "time_remaining", "timer_status" };
+                            if (item != null)
+                            {
+                                var itemType = item["type"]?.ToString();
+                                var className = item["class_name"]?.ToString();
+                                var keyLetter = item["KL"]?.ToString();
 
-                            foreach (var attribute in attributes)
-                            {
-                                var attributeName = attribute["attribute_name"]?.ToString();
-                                requiredAttributes.Remove(attributeName);
-                            }
+                                if (itemType == "class" && className == "TIMER" && keyLetter == "TIM")
+                                {
+                                    timerObjectFound = true;
+                                    var attributes = item["attributes"] as JArray;
+                                    if (attributes != null)
+                                    {
+                                        var requiredAttributes = new HashSet<string> { "timer_id", "instance_id", "event_label", "time_remaining", "timer_status" };
 
-                            if (requiredAttributes.Count > 0)
-                            {
-                                textBox4.AppendText("Syntax error 21: TIMER object is missing required attributes: " + string.Join(", ", requiredAttributes) + ".\r\n");
-                            }
-                        }
-                        else
-                        {
-                            if (reservedNames.Contains(className))
-                            {
-                                textBox4.AppendText($"Syntax error 21: Reserved name {className} used for another object.\r\n");
-                            }
+                                        foreach (var attribute in attributes)
+                                        {
+                                            if (attribute != null)
+                                            {
+                                                var attributeName = attribute["attribute_name"]?.ToString();
+                                                requiredAttributes.Remove(attributeName);
+                                            }
+                                        }
 
-                            if (reservedKeyLetters.Contains(keyLetter))
-                            {
-                                textBox4.AppendText($"Syntax error 21: Reserved KeyLetter {keyLetter} used for another object.\r\n");
+                                        if (requiredAttributes.Count > 0)
+                                        {
+                                            textBox4.AppendText("Syntax error 21: TIMER object is missing required attributes: " + string.Join(", ", requiredAttributes) + ".\r\n");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        textBox4.AppendText("Syntax error 21: TIMER object does not have an attributes array.\r\n");
+                                    }
+                                }
+                                else
+                                {
+                                    if (!string.IsNullOrWhiteSpace(className) && reservedNames.Contains(className))
+                                    {
+                                        textBox4.AppendText($"Syntax error 21: Reserved name {className} used for another object.\r\n");
+                                    }
+
+                                    if (!string.IsNullOrWhiteSpace(keyLetter) && reservedKeyLetters.Contains(keyLetter))
+                                    {
+                                        textBox4.AppendText($"Syntax error 21: Reserved KeyLetter {keyLetter} used for another object.\r\n");
+                                    }
+                                }
                             }
                         }
                     }
@@ -1564,7 +1622,7 @@ namespace xtUML1
                                     var stateEvents = state["state_event"]?.ToArray();
                                     if (stateEvents == null || stateEvents.Length == 0)
                                     {
-                                        textBox4.AppendText($"Syntax error 22: State {state["state_name"]} does not generate any events.\r\n");
+                                        textBox4.AppendText($"Syntax error 22: State {state["state_model_name"]} does not generate any events.\r\n");
                                     }
                                 }
                             }
@@ -1605,7 +1663,7 @@ namespace xtUML1
                                         var stateEvents = state["state_event"]?.ToArray();
                                         if (stateEvents == null || stateEvents.Length == 0)
                                         {
-                                            textBox4.AppendText($"Syntax error 22: State {state["state_name"]} does not generate any events.\r\n");
+                                            textBox4.AppendText($"Syntax error 22: State {state["state_model_name"]} does not generate any events.\r\n");
                                         }
                                     }
                                 }
@@ -1707,7 +1765,7 @@ namespace xtUML1
                             {
                                 foreach (var state in stateArray)
                                 {
-                                    var stateName = state["state_name"]?.ToString();
+                                    var stateName = state["state_model_name"]?.ToString();
                                     var stateEvent = state["state_event"]?.ToString();
                                     if (stateEvent != null)
                                     {
@@ -1731,11 +1789,22 @@ namespace xtUML1
                 };
                 foreach (var subsystem in jsonArray)
                 {
-                    foreach (var item in subsystem["model"])
+                    if (subsystem != null && subsystem["model"] is JArray modelItems)
                     {
-                        if (!processItem(item))
+                        foreach (var item in modelItems)
                         {
-                            return false;
+                            if (item != null)
+                            {
+                                // Process each item and check if processItem returns false
+                                if (!processItem(item))
+                                {
+                                    return false; // Exit early if processing fails
+                                }
+                            }
+                            else
+                            {
+                                textBox4.AppendText("Syntax error: Encountered a null item in the model.\r\n");
+                            }
                         }
                     }
                 }
@@ -1771,11 +1840,22 @@ namespace xtUML1
                 };
                 foreach (var subsystem in jsonArray)
                 {
-                    foreach (var item in subsystem["model"])
+                    if (subsystem != null && subsystem["model"] is JArray modelItems)
                     {
-                        if (!processItem(item))
+                        foreach (var item in modelItems)
                         {
-                            return false;
+                            if (item != null)
+                            {
+                                // Process each item and check if processItem returns false
+                                if (!processItem(item))
+                                {
+                                    return false; // Exit early if processing fails
+                                }
+                            }
+                            else
+                            {
+                                textBox4.AppendText("Syntax error: Encountered a null item in the model.\r\n");
+                            }
                         }
                     }
                 }
@@ -1798,40 +1878,50 @@ namespace xtUML1
                 {
                     Dictionary<string, Dictionary<string, HashSet<string>>> stateEventsData = new Dictionary<string, Dictionary<string, HashSet<string>>>();
 
-                    foreach (var item in subsystem["model"])
+                    if (subsystem["model"] is JArray modelArray)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        if (itemType == "class" || itemType == "association_class")
+                        foreach (var item in modelArray)
                         {
-                            foreach (var state in item["states"] ?? Enumerable.Empty<dynamic>())
+                            var itemType = item["type"]?.ToString();
+
+                            // Check for TIM1 and TIM2 within association_class or class types that involve timers
+                            if (itemType == "class" || itemType == "association_class")
                             {
-                                var stateName = state["state_name"]?.ToString();
+                                var attributes = item["attributes"] as JArray;
 
-                                if (!stateEventsData.ContainsKey(stateName))
+                                if (attributes != null)
                                 {
-                                    stateEventsData[stateName] = new Dictionary<string, HashSet<string>>();
-                                }
-
-                                foreach (var eventName in state["state_event"])
-                                {
-                                    var eventString = eventName?.ToString();
-                                    var eventData = string.Join(",", state["state_event"]); // Simulasikan data event
-
-                                    if (!stateEventsData[stateName].ContainsKey(eventString))
+                                    foreach (var attribute in attributes)
                                     {
-                                        stateEventsData[stateName][eventString] = new HashSet<string>();
-                                    }
+                                        var attributeName = attribute["attribute_name"]?.ToString();
 
-                                    if (stateEventsData[stateName][eventString].Count == 0)
-                                    {
-                                        stateEventsData[stateName][eventString].Add(eventData);
-                                    }
-                                    else
-                                    {
-                                        if (!stateEventsData[stateName][eventString].Contains(eventData))
+                                        if (attributeName == "timer_id")
                                         {
-                                            textBox4.AppendText($"Syntax error: Event data inconsistency in state {stateName} for event {eventString}. \r\n");
+                                            if (string.IsNullOrWhiteSpace(attributeName))
+                                            {
+                                                textBox4.AppendText("Syntax error: timer_id is empty. \r\n");
+                                            }
+                                        }
+                                        else if (attributeName == "ELx")
+                                        {
+                                            if (string.IsNullOrWhiteSpace(attributeName))
+                                            {
+                                                textBox4.AppendText("Syntax error: ELx is empty. \r\n");
+                                            }
+                                        }
+                                        else if (attributeName == "instance_id")
+                                        {
+                                            if (string.IsNullOrWhiteSpace(attributeName))
+                                            {
+                                                textBox4.AppendText("Syntax error: instance_id is empty. \r\n");
+                                            }
+                                        }
+                                        else if (attributeName == "time_interval")
+                                        {
+                                            if (string.IsNullOrWhiteSpace(attributeName))
+                                            {
+                                                textBox4.AppendText("Syntax error: time_interval is empty. \r\n");
+                                            }
                                         }
                                     }
                                 }
@@ -1858,50 +1948,54 @@ namespace xtUML1
             {
                 foreach (var subsystem in jsonArray)
                 {
-                    foreach (var item in subsystem["model"])
+                    if (subsystem["model"] is JArray modelArray)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        // Check for TIM1 and TIM2 within association_class or class types that involve timers
-                        if (itemType == "class" || itemType == "association_class")
+                        foreach (var item in modelArray)
                         {
-                            if (item["attributes"] != null)
+                            var itemType = item["type"]?.ToString();
+
+                            // Check for TIM1 and TIM2 within association_class or class types that involve timers
+                            if (itemType == "class" || itemType == "association_class")
                             {
-                                foreach (var attribute in item["attributes"])
+                                // Ensure attributes is not null and is a JArray
+                                var attributes = item["attributes"] as JArray;
+                                if (attributes != null)
                                 {
-                                    if (attribute["attribute_name"]?.ToString() == "timer_id")
+                                    foreach (var attribute in attributes)
                                     {
-                                        var timerId = attribute["attribute_name"]?.ToString();
-                                        if (string.IsNullOrWhiteSpace(timerId))
-                                        {
-                                            textBox4.AppendText("Syntax error: timer_id is empty. \r\n");
-                                        }
-                                    }
+                                        var attributeName = attribute["attribute_name"]?.ToString();
 
-                                    if (attribute["attribute_name"]?.ToString() == "ELx")
-                                    {
-                                        var elx = attribute["attribute_name"]?.ToString();
-                                        if (string.IsNullOrWhiteSpace(elx))
+                                        if (attributeName == "timer_id")
                                         {
-                                            textBox4.AppendText("Syntax error: ELx is empty. \r\n");
+                                            // Timer ID specific check
+                                            if (string.IsNullOrWhiteSpace(attributeName))
+                                            {
+                                                textBox4.AppendText("Syntax error: timer_id is empty. \r\n");
+                                            }
                                         }
-                                    }
-
-                                    if (attribute["attribute_name"]?.ToString() == "instance_id")
-                                    {
-                                        var instanceId = attribute["attribute_name"]?.ToString();
-                                        if (string.IsNullOrWhiteSpace(instanceId))
+                                        else if (attributeName == "ELx")
                                         {
-                                            textBox4.AppendText("Syntax error: instance_id is empty. \r\n");
+                                            // ELx specific check
+                                            if (string.IsNullOrWhiteSpace(attributeName))
+                                            {
+                                                textBox4.AppendText("Syntax error: ELx is empty. \r\n");
+                                            }
                                         }
-                                    }
-
-                                    if (attribute["attribute_name"]?.ToString() == "time_interval")
-                                    {
-                                        var timeInterval = attribute["attribute_name"]?.ToString();
-                                        if (string.IsNullOrWhiteSpace(timeInterval))
+                                        else if (attributeName == "instance_id")
                                         {
-                                            textBox4.AppendText("Syntax error: time_interval is empty. \r\n");
+                                            // Instance ID specific check
+                                            if (string.IsNullOrWhiteSpace(attributeName))
+                                            {
+                                                textBox4.AppendText("Syntax error: instance_id is empty. \r\n");
+                                            }
+                                        }
+                                        else if (attributeName == "time_interval")
+                                        {
+                                            // Time interval specific check
+                                            if (string.IsNullOrWhiteSpace(attributeName))
+                                            {
+                                                textBox4.AppendText("Syntax error: time_interval is empty. \r\n");
+                                            }
                                         }
                                     }
                                 }
@@ -2176,7 +2270,7 @@ namespace xtUML1
                         {
                             foreach (var sub in states)
                             {
-                                var stateName = sub["state_name"]?.ToString();
+                                var stateName = sub["state_model_name"]?.ToString();
                                 var stateEvent = sub["state_event"]?.ToString();
                                 if (stateEvent != null)
                                 {
@@ -2199,13 +2293,17 @@ namespace xtUML1
                 };
                 foreach (var subsystem in jsonArray)
                 {
-                    foreach (var item in subsystem["model"])
+                    if (subsystem["model"] is JArray modelArray)
                     {
-                        if (item.Contains("states"))
+                        foreach (var item in modelArray)
                         {
-                            if (!processItem(item))
+                            // Check if item is a JObject and has the "states" property
+                            if (item is JObject itemObject && itemObject.ContainsKey("states"))
                             {
-                                return false;
+                                if (!processItem(itemObject))
+                                {
+                                    return false;
+                                }
                             }
                         }
                     }
@@ -2326,19 +2424,25 @@ namespace xtUML1
                 {
                     var subsystemId = subsystem["sub_id"]?.ToString();
 
-                    foreach (var item in subsystem["model"])
+                    if (subsystem["model"] is JArray modelArray)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        if (itemType == "association")
+                        foreach (var item in modelArray)
                         {
-                            var associationClass = item["class"] as JArray;
-
-                            // Pastikan association memiliki dua class di dalamnya
-                            if (associationClass == null || associationClass.Count != 2)
+                            if (item is JObject itemObject)
                             {
-                                textBox4.AppendText($"Syntax error 99: Subsystem {subsystemId} has an association {item["name"]?.ToString()} that lacks a relationship between two classes within it. \r\n");
+                                var itemType = itemObject["type"]?.ToString();
 
+                                if (itemType == "association")
+                                {
+                                    var associationClass = itemObject["class"] as JArray;
+
+                                    // Ensure associationClass is not null and has exactly two items
+                                    if (associationClass == null || associationClass.Count != 2)
+                                    {
+                                        var associationName = itemObject["name"]?.ToString();
+                                        textBox4.AppendText($"Syntax error 99: Subsystem {subsystemId} has an association {associationName} that lacks a relationship between two classes within it. \r\n");
+                                    }
+                                }
                             }
                         }
                     }
@@ -3491,24 +3595,30 @@ namespace xtUML1
                 // Collect all available data and control stores
                 foreach (var subsystem in jsonArray)
                 {
-                    foreach (var item in subsystem["model"])
+                    if (subsystem["model"] is JArray modelArray)
                     {
-                        var itemType = item["type"]?.ToString();
+                        foreach (var item in modelArray)
+                        {
+                            if (item is JObject itemObject)
+                            {
+                                var itemType = itemObject["type"]?.ToString();
 
-                        if (itemType == "data_store")
-                        {
-                            var storeName = item["store_name"]?.ToString();
-                            if (!string.IsNullOrWhiteSpace(storeName))
-                            {
-                                dataStores.Add(storeName);
-                            }
-                        }
-                        else if (itemType == "control_store")
-                        {
-                            var controlName = item["control_name"]?.ToString();
-                            if (!string.IsNullOrWhiteSpace(controlName))
-                            {
-                                controlStores.Add(controlName);
+                                if (itemType == "data_store")
+                                {
+                                    var storeName = itemObject["store_name"]?.ToString();
+                                    if (!string.IsNullOrWhiteSpace(storeName))
+                                    {
+                                        dataStores.Add(storeName);
+                                    }
+                                }
+                                else if (itemType == "control_store")
+                                {
+                                    var controlName = itemObject["control_name"]?.ToString();
+                                    if (!string.IsNullOrWhiteSpace(controlName))
+                                    {
+                                        controlStores.Add(controlName);
+                                    }
+                                }
                             }
                         }
                     }
@@ -3517,46 +3627,52 @@ namespace xtUML1
                 // Check each process for required inputs
                 foreach (var subsystem in jsonArray)
                 {
-                    foreach (var item in subsystem["model"])
+                    if (subsystem["model"] is JArray modelArray)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        if (itemType == "process")
+                        foreach (var item in modelArray)
                         {
-                            var processName = item["process_name"]?.ToString();
-                            var dataInputs = item["data_inputs"] as JArray;
-                            var controlInputs = item["control_inputs"] as JArray;
-                            bool allInputsAvailable = true;
-
-                            if (dataInputs != null)
+                            if (item is JObject itemObject)
                             {
-                                foreach (var input in dataInputs)
+                                var itemType = itemObject["type"]?.ToString();
+
+                                if (itemType == "process")
                                 {
-                                    var inputName = input.ToString();
-                                    if (!dataStores.Contains(inputName))
+                                    var processName = itemObject["process_name"]?.ToString();
+                                    var dataInputs = itemObject["data_inputs"] as JArray;
+                                    var controlInputs = itemObject["control_inputs"] as JArray;
+                                    bool allInputsAvailable = true;
+
+                                    if (dataInputs != null)
                                     {
-                                        textBox4.AppendText($"Syntax error 56: Data input {inputName} for process {processName} is not available. \r\n");
-                                        allInputsAvailable = false;
+                                        foreach (var input in dataInputs)
+                                        {
+                                            var inputName = input?.ToString();
+                                            if (!string.IsNullOrWhiteSpace(inputName) && !dataStores.Contains(inputName))
+                                            {
+                                                textBox4.AppendText($"Syntax error 56: Data input {inputName} for process {processName} is not available. \r\n");
+                                                allInputsAvailable = false;
+                                            }
+                                        }
+                                    }
+
+                                    if (controlInputs != null)
+                                    {
+                                        foreach (var input in controlInputs)
+                                        {
+                                            var inputName = input?.ToString();
+                                            if (!string.IsNullOrWhiteSpace(inputName) && !controlStores.Contains(inputName))
+                                            {
+                                                textBox4.AppendText($"Syntax error 56: Control input {inputName} for process {processName} is not available. \r\n");
+                                                allInputsAvailable = false;
+                                            }
+                                        }
+                                    }
+
+                                    if (!allInputsAvailable)
+                                    {
+                                        return false;
                                     }
                                 }
-                            }
-
-                            if (controlInputs != null)
-                            {
-                                foreach (var input in controlInputs)
-                                {
-                                    var inputName = input.ToString();
-                                    if (!controlStores.Contains(inputName))
-                                    {
-                                        textBox4.AppendText($"Syntax error 56: Control input {inputName} for process {processName} is not available. \r\n");
-                                        allInputsAvailable = false;
-                                    }
-                                }
-                            }
-
-                            if (!allInputsAvailable)
-                            {
-                                return false;
                             }
                         }
                     }
@@ -3581,24 +3697,30 @@ namespace xtUML1
                 // Collect all available data and control stores
                 foreach (var subsystem in jsonArray)
                 {
-                    foreach (var item in subsystem["model"])
+                    if (subsystem["model"] is JArray modelArray)
                     {
-                        var itemType = item["type"]?.ToString();
+                        foreach (var item in modelArray)
+                        {
+                            if (item is JObject itemObject)
+                            {
+                                var itemType = itemObject["type"]?.ToString();
 
-                        if (itemType == "data_store")
-                        {
-                            var storeName = item["store_name"]?.ToString();
-                            if (!string.IsNullOrWhiteSpace(storeName))
-                            {
-                                dataStores.Add(storeName);
-                            }
-                        }
-                        else if (itemType == "control_store")
-                        {
-                            var controlName = item["control_name"]?.ToString();
-                            if (!string.IsNullOrWhiteSpace(controlName))
-                            {
-                                controlStores.Add(controlName);
+                                if (itemType == "data_store")
+                                {
+                                    var storeName = itemObject["store_name"]?.ToString();
+                                    if (!string.IsNullOrWhiteSpace(storeName))
+                                    {
+                                        dataStores.Add(storeName);
+                                    }
+                                }
+                                else if (itemType == "control_store")
+                                {
+                                    var controlName = itemObject["control_name"]?.ToString();
+                                    if (!string.IsNullOrWhiteSpace(controlName))
+                                    {
+                                        controlStores.Add(controlName);
+                                    }
+                                }
                             }
                         }
                     }
@@ -3607,46 +3729,49 @@ namespace xtUML1
                 // Check each process for required outputs
                 foreach (var subsystem in jsonArray)
                 {
-                    foreach (var item in subsystem["model"])
+                    if (subsystem["model"] != null)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        if (itemType == "process")
+                        foreach (var item in subsystem["model"])
                         {
-                            var processName = item["process_name"]?.ToString();
-                            var dataOutputs = item["data_outputs"] as JArray;
-                            var controlOutputs = item["control_outputs"] as JArray;
-                            bool allOutputsAvailable = true;
+                            var itemType = item["type"]?.ToString();
 
-                            if (dataOutputs != null)
+                            if (itemType == "process")
                             {
-                                foreach (var output in dataOutputs)
+                                var processName = item["process_name"]?.ToString();
+                                var dataOutputs = item["data_outputs"] as JArray;
+                                var controlOutputs = item["control_outputs"] as JArray;
+                                bool allOutputsAvailable = true;
+
+                                if (dataOutputs != null)
                                 {
-                                    var outputName = output.ToString();
-                                    if (!dataStores.Contains(outputName))
+                                    foreach (var output in dataOutputs)
                                     {
-                                        textBox4.AppendText($"Syntax error 57: Data output {outputName} from process {processName} is not available in data stores. \r\n");
-                                        allOutputsAvailable = false;
+                                        var outputName = output?.ToString();
+                                        if (outputName != null && !dataStores.Contains(outputName))
+                                        {
+                                            textBox4.AppendText($"Syntax error 57: Data output {outputName} from process {processName} is not available in data stores. \r\n");
+                                            allOutputsAvailable = false;
+                                        }
                                     }
                                 }
-                            }
 
-                            if (controlOutputs != null)
-                            {
-                                foreach (var output in controlOutputs)
+                                if (controlOutputs != null)
                                 {
-                                    var outputName = output.ToString();
-                                    if (!controlStores.Contains(outputName))
+                                    foreach (var output in controlOutputs)
                                     {
-                                        textBox4.AppendText($"Syntax error 57: Control output {outputName} from process {processName} is not available in control stores. \r\n");
-                                        allOutputsAvailable = false;
+                                        var outputName = output?.ToString();
+                                        if (outputName != null && !controlStores.Contains(outputName))
+                                        {
+                                            textBox4.AppendText($"Syntax error 57: Control output {outputName} from process {processName} is not available in control stores. \r\n");
+                                            allOutputsAvailable = false;
+                                        }
                                     }
                                 }
-                            }
 
-                            if (!allOutputsAvailable)
-                            {
-                                return false;
+                                if (!allOutputsAvailable)
+                                {
+                                    return false;
+                                }
                             }
                         }
                     }
@@ -3672,25 +3797,28 @@ namespace xtUML1
                 // Mengumpulkan semua data store dan control store yang tersedia
                 foreach (var subsystem in jsonArray)
                 {
-                    foreach (var item in subsystem["model"])
+                    if (subsystem["model"] != null)
                     {
-                        var itemType = item["typedata"]?.ToString();
+                        foreach (var item in subsystem["model"])
+                        {
+                            var itemType = item["typedata"]?.ToString();
 
-                        if (itemType == "dataStore")
-                        {
-                            var storeName = item["store_name"]?.ToString();
-                            if (!string.IsNullOrWhiteSpace(storeName))
+                            if (itemType == "dataStore")
                             {
-                                dataStores.Add(storeName);
-                                Debug.WriteLine($"DataStore : {storeName}");
+                                var storeName = item["store_name"]?.ToString();
+                                if (!string.IsNullOrWhiteSpace(storeName))
+                                {
+                                    dataStores.Add(storeName);
+                                    Debug.WriteLine($"DataStore : {storeName}");
+                                }
                             }
-                        }
-                        else if (itemType == "control_store")
-                        {
-                            var controlName = item["control_name"]?.ToString();
-                            if (!string.IsNullOrWhiteSpace(controlName))
+                            else if (itemType == "control_store")
                             {
-                                controlStores.Add(controlName);
+                                var controlName = item["control_name"]?.ToString();
+                                if (!string.IsNullOrWhiteSpace(controlName))
+                                {
+                                    controlStores.Add(controlName);
+                                }
                             }
                         }
                     }
@@ -3699,56 +3827,60 @@ namespace xtUML1
                 // Memeriksa setiap state untuk event data yang diperlukan
                 foreach (var subsystem in jsonArray)
                 {
-                    foreach (var item in subsystem["model"])
+                    if (subsystem["model"] != null)
                     {
-                        var itemType = item["type"]?.ToString();
-
-                        if (itemType == "class")
+                        foreach (var item in subsystem["model"])
                         {
-                            var className = item["class_name"]?.ToString();
-                            var states = item["states"] as JArray;
+                            var itemType = item["type"]?.ToString();
 
-                            if (states != null)
+                            if (itemType == "class")
                             {
-                                foreach (var state in states)
+                                var className = item["class_name"]?.ToString();
+                                var states = item["states"] as JArray;
+
+                                if (states != null)
                                 {
-                                    var stateName = state["state_name"]?.ToString();
-                                    var stateId = state["state_id"]?.ToString();
-                                    var stateEvents = state["state_event"] as JArray;
-                                    var eventData = state["event_data"] as JArray;
-
-                                    if (stateEvents != null)
+                                    foreach (var state in states)
                                     {
+                                        var stateName = state["state_model_name"]?.ToString();
+                                        var stateId = state["state_id"]?.ToString();
+                                        var stateEvents = state["state_event"] as JArray;
+                                        var eventData = state["event_data"] as JArray;
 
-                                        if (eventData == null)
+                                        if (stateEvents != null)
                                         {
-                                            textBox4.AppendText($"Syntax error 58: State {stateName} with id {stateId} of class {className} has events but no event data defined. \r\n");
-                                            return false;
-                                        }
-
-                                        foreach (var stateEvent in stateEvents)
-                                        {
-                                            var eventName = stateEvent?.ToString();
-
-
-                                            foreach (var data in eventData)
+                                            if (eventData == null)
                                             {
-                                                var dataName = data.ToString();
-                                                Debug.WriteLine($"dn : {dataName}");
-                                                controlStores.ToList<String>().ForEach(x => Debug.WriteLine($"dns : {x}"));
+                                                textBox4.AppendText($"Syntax error 58: State {stateName} with id {stateId} of class {className} has events but no event data defined. \r\n");
+                                                return false;
+                                            }
 
-                                                if (!dataStores.First().Contains(dataName) && !controlStores.Contains(dataName))
+                                            foreach (var stateEvent in stateEvents)
+                                            {
+                                                var eventName = stateEvent?.ToString();
+
+                                                if (eventData != null)
                                                 {
-                                                    textBox4.AppendText($"Syntax error 58: Event data {dataName} for event {eventName} in state {stateName} of class {className} is not available on {String.Join(",", dataStores)} or on .{String.Join(",", controlStores)} \r\n");
-                                                    return false;
+                                                    foreach (var data in eventData)
+                                                    {
+                                                        var dataName = data?.ToString();
+                                                        Debug.WriteLine($"dn : {dataName}");
+                                                        controlStores.ToList().ForEach(x => Debug.WriteLine($"dns : {x}"));
+
+                                                        if (!dataStores.Any(store => store.Contains(dataName)) && !controlStores.Contains(dataName))
+                                                        {
+                                                            textBox4.AppendText($"Syntax error 58: Event data {dataName} for event {eventName} in state {stateName} of class {className} is not available in data stores or control stores. \r\n");
+                                                            return false;
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                    else
-                                    {
-                                        textBox4.AppendText($"Syntax error 58: State {stateName} of class {className} has no events defined. 2 \r\n");
-                                        return false;
+                                        else
+                                        {
+                                            textBox4.AppendText($"Syntax error 58: State {stateName} of class {className} has no events defined. \r\n");
+                                            return false;
+                                        }
                                     }
                                 }
                             }
@@ -3901,48 +4033,58 @@ namespace xtUML1
             {
                 foreach (var subsystem in jsonArray)
                 {
-                    foreach (var item in subsystem["model"])
+                    if (subsystem["model"] != null)
                     {
-                        if (item["processes"] is JArray processes)
+                        foreach (var item in subsystem["model"])
                         {
-                            foreach (var process in processes)
+                            if (item["processes"] is JArray processes)
                             {
-                                var processType = process["process_type"]?.ToString();
-                                if (string.IsNullOrWhiteSpace(processType))
+                                foreach (var process in processes)
                                 {
-                                    textBox4.AppendText("Syntax error 61: Process type is missing.\r\n");
-                                    continue;
-                                }
+                                    // Use null-conditional operators and default values to avoid NullReferenceException
+                                    var processType = process["process_type"]?.ToString();
+                                    var processName = process["process_name"]?.ToString();
 
-                                switch (processType)
-                                {
-                                    case "accessor":
-                                        if (process["data_store"] == null)
-                                        {
-                                            textBox4.AppendText($"Syntax error 61: Accessor process {process["process_name"]} must specify a data store.\r\n");
-                                        }
-                                        break;
-                                    case "transformation":
-                                        if (process["input_data"] == null || process["output_data"] == null)
-                                        {
-                                            textBox4.AppendText($"Syntax error 61: Transformation process {process["process_name"]} must specify input and output data.\r\n");
-                                        }
-                                        break;
-                                    case "event_generator":
-                                        if (process["event"] == null)
-                                        {
-                                            textBox4.AppendText($"Syntax error 61: Event generator process {process["process_name"]} must specify an event.\r\n");
-                                        }
-                                        break;
-                                    case "test":
-                                        if (process["condition"] == null || process["true_output"] == null || process["false_output"] == null)
-                                        {
-                                            textBox4.AppendText($"Syntax error 61: Test process {process["process_name"]} must specify a condition and true/false outputs.\r\n");
-                                        }
-                                        break;
-                                    default:
-                                        textBox4.AppendText($"Syntax error 61: Unknown process type {processType} in process {process["process_name"]}.\r\n");
-                                        break;
+                                    if (string.IsNullOrWhiteSpace(processType))
+                                    {
+                                        textBox4.AppendText("Syntax error 61: Process type is missing.\r\n");
+                                        continue; // Skip to the next process if process type is missing
+                                    }
+
+                                    switch (processType)
+                                    {
+                                        case "accessor":
+                                            if (process["data_store"] == null)
+                                            {
+                                                textBox4.AppendText($"Syntax error 61: Accessor process {processName} must specify a data store.\r\n");
+                                            }
+                                            break;
+
+                                        case "transformation":
+                                            if (process["input_data"] == null || process["output_data"] == null)
+                                            {
+                                                textBox4.AppendText($"Syntax error 61: Transformation process {processName} must specify input and output data.\r\n");
+                                            }
+                                            break;
+
+                                        case "event_generator":
+                                            if (process["event"] == null)
+                                            {
+                                                textBox4.AppendText($"Syntax error 61: Event generator process {processName} must specify an event.\r\n");
+                                            }
+                                            break;
+
+                                        case "test":
+                                            if (process["condition"] == null || process["true_output"] == null || process["false_output"] == null)
+                                            {
+                                                textBox4.AppendText($"Syntax error 61: Test process {processName} must specify a condition and true/false outputs.\r\n");
+                                            }
+                                            break;
+
+                                        default:
+                                            textBox4.AppendText($"Syntax error 61: Unknown process type {processType} in process {processName}.\r\n");
+                                            break;
+                                    }
                                 }
                             }
                         }
