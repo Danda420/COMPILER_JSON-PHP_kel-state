@@ -91,9 +91,6 @@ namespace xtUML1
                 //    }
                 //}
 
-                sourceCodeBuilder.AppendLine($"class TIMER {{");
-                sourceCodeBuilder.AppendLine($"}}");
-
                 // Display or save the generated PHP code
                 translatedPhpCode = sourceCodeBuilder.ToString();
             }
@@ -122,8 +119,11 @@ namespace xtUML1
                 {
                     foreach (JsonData.State state in model.states)
                     {
-                        string stateAdd = state.state_name.Replace(" ", "");
-                        states.Add(stateAdd);
+                        if (state.state_name != null)
+                        {
+                            string stateAdd = state.state_name.Replace(" ", "");
+                            states.Add(stateAdd);
+                        }
                     }
                 }
                 if (model.model != null && model.model.states != null)
@@ -175,83 +175,97 @@ namespace xtUML1
 
         private void GenerateStateAction(JsonData.Model model)
         {
+            bool attrNameExists = false;
             foreach (JsonData.Attribute1 attr in model.attributes)
             {
                 if (attr.default_value != null)
                 {
-                    stateAttribute = attr.attribute_name;
+                    if (attr.attribute_name == null)
+                    {
+                        attrNameExists = false;
+                    } else
+                    {
+                        attrNameExists = true;
+                        stateAttribute = attr.attribute_name;
+                    }
                 }
             }
-            sourceCodeBuilder.AppendLine("      " +
+            if (attrNameExists == true)
+            {
+                sourceCodeBuilder.AppendLine("      " +
                             $"public function onStateAction()");
-            sourceCodeBuilder.AppendLine("      {");
-            sourceCodeBuilder.AppendLine("           " +
-                $"switch($this->{stateAttribute})" + " {");
-            foreach (JsonData.State statess in model.states)
-            {
-                sourceCodeBuilder.AppendLine("              " +
-                    $"case {model.class_name}States::{statess.state_name.Replace(" ", "").ToUpper()}:");
-                sourceCodeBuilder.AppendLine("                  " +
-                    "// implementations code here");
-                if (statess.transitions != null)
+                sourceCodeBuilder.AppendLine("      {");
+                sourceCodeBuilder.AppendLine("           " +
+                    $"switch($this->{stateAttribute})" + " {");
+                foreach (JsonData.State statess in model.states)
                 {
-                    foreach (var transition in statess.transitions)
+                    if (statess.state_name != null)
                     {
+                        sourceCodeBuilder.AppendLine("              " +
+                        $"case {model.class_name}States::{statess.state_name.Replace(" ", "").ToUpper()}:");
                         sourceCodeBuilder.AppendLine("                  " +
-                            $"if ($this->{stateAttribute} == {model.class_name}States::{transition.target_state.Replace(" ", "").ToUpper()}) {{");
-                        sourceCodeBuilder.AppendLine("                      " +
-                            $"$this->{transition.target_state_event}();");
-                        sourceCodeBuilder.AppendLine("                  }");
-                    }
-                }
-                sourceCodeBuilder.AppendLine("                  " +
-                    "break;");
-            }
-            sourceCodeBuilder.AppendLine("              " +
-                    $"default:");
-            sourceCodeBuilder.AppendLine("                  " +
-                    "break;");
-            sourceCodeBuilder.AppendLine("           }");
-            sourceCodeBuilder.AppendLine("      }");
-            foreach (JsonData.State state in model.states)
-            {
-                void stateEventBuilder(string stateEvent)
-                {
-                    sourceCodeBuilder.AppendLine("");
-                    sourceCodeBuilder.AppendLine("      " +
-                        $"public function {stateEvent}()" + " {");
-                    foreach (JsonData.Attribute1 attr in model.attributes)
-                    {
-                        if (attr.data_type == "state")
+                            "// implementations code here");
+                        if (statess.transitions != null)
                         {
-                            sourceCodeBuilder.AppendLine("           " +
-                                    $"if ($this->{attr.attribute_name} != {model.class_name}States::{state.state_name.Replace(" ", "").ToUpper()})" + " {");
-                            sourceCodeBuilder.AppendLine("               " +
-                                $"$this->{attr.attribute_name} = {model.class_name}States::{state.state_name.Replace(" ", "").ToUpper()};");
-                            sourceCodeBuilder.AppendLine("           }");
-                        }
-                    }
-                    sourceCodeBuilder.AppendLine("      }");
-                }
-
-                if (state.state_event != null)
-                {
-                    var stateEventArray = state.state_event as JArray;
-                    if (stateEventArray != null)
-                    {
-                        foreach (var item in stateEventArray)
-                        {
-                            string stateEvent = item.ToString();
-                            if (!stateEvent.StartsWith("on", StringComparison.OrdinalIgnoreCase))
+                            foreach (var transition in statess.transitions)
                             {
-                                stateEventBuilder(stateEvent);
+                                sourceCodeBuilder.AppendLine("                  " +
+                                    $"if ($this->{stateAttribute} == {model.class_name}States::{transition.target_state.Replace(" ", "").ToUpper()}) {{");
+                                sourceCodeBuilder.AppendLine("                      " +
+                                    $"$this->{transition.target_state_event}();");
+                                sourceCodeBuilder.AppendLine("                  }");
                             }
                         }
+                        sourceCodeBuilder.AppendLine("                  " +
+                            "break;");
                     }
-                    else if (state.state_event is string)
+                }
+                sourceCodeBuilder.AppendLine("              " +
+                        $"default:");
+                sourceCodeBuilder.AppendLine("                  " +
+                        "break;");
+                sourceCodeBuilder.AppendLine("           }");
+                sourceCodeBuilder.AppendLine("      }");
+                foreach (JsonData.State state in model.states)
+                {
+                    void stateEventBuilder(string stateEvent)
                     {
-                        string stateEvent = state.state_event.ToString();
-                        stateEventBuilder(stateEvent);
+                        sourceCodeBuilder.AppendLine("");
+                        sourceCodeBuilder.AppendLine("      " +
+                            $"public function {stateEvent}()" + " {");
+                        foreach (JsonData.Attribute1 attr in model.attributes)
+                        {
+                            if (attr.data_type == "state" && state.state_name != null)
+                            {
+                                sourceCodeBuilder.AppendLine("           " +
+                                        $"if ($this->{attr.attribute_name} != {model.class_name}States::{state.state_name.Replace(" ", "").ToUpper()})" + " {");
+                                sourceCodeBuilder.AppendLine("               " +
+                                    $"$this->{attr.attribute_name} = {model.class_name}States::{state.state_name.Replace(" ", "").ToUpper()};");
+                                sourceCodeBuilder.AppendLine("           }");
+                            }
+                        }
+                        sourceCodeBuilder.AppendLine("      }");
+                    }
+
+                    if (state.state_event != null)
+                    {
+                        var stateEventArray = state.state_event as JArray;
+                        if (stateEventArray != null)
+                        {
+                            foreach (var item in stateEventArray)
+                            {
+                                string stateEvent = item.ToString();
+                                if (!stateEvent.StartsWith("on", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    stateEventBuilder(stateEvent);
+                                }
+                            }
+                        }
+                        else if (state.state_event is string)
+                        {
+                            string stateEvent = state.state_event.ToString();
+                            stateEventBuilder(stateEvent);
+                        }
                     }
                 }
             }
