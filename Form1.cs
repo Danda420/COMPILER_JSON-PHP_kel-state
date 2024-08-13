@@ -24,7 +24,7 @@ namespace xtUML1
         private string[] fileNames;
         private bool isJsonFileSelected = false;
         private Translate translator;
-        private bool parsed = true;
+        private bool parsed = false;
         private Visualize_State visualizeState;
         private VisualizeClass visualizeClass;
 
@@ -210,11 +210,11 @@ namespace xtUML1
             Parsing.Point71(this, jsonArray);
             Parsing.Point72(this, jsonArray);
 
-            if (string.IsNullOrWhiteSpace(textBox4.Text))
+            // Check if "error" is present in textBox4
+            if (!textBox4.Text.Contains("error"))
             {
                 MessageBox.Show("Model has successfully passed parsing", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 parsed = true;
-
                 textBox4.Text = isiFileJson;
             }
             else
@@ -272,7 +272,7 @@ namespace xtUML1
             isJsonFileSelected = false; // Reset the flag indicating whether a JSON file is selected
             selectedFilePath = null; // Reset the selected file path
             fileNames = null;
-            parsed = true; // Reset the parsed variable
+            parsed = false; // Reset the parsed variable
         }
 
         private void btnHelp_Click(object sender, EventArgs e)
